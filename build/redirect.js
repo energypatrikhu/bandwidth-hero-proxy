@@ -1,0 +1,1 @@
+function o(t,e){e.headersSent||(e.setHeader("content-length",0),e.removeHeader("cache-control"),e.removeHeader("expires"),e.removeHeader("date"),e.removeHeader("etag"),e.setHeader("location",encodeURI(t.params.url)),e.status(302).end(),gc&&gc(),global.gc&&global.gc())}export{o as default};

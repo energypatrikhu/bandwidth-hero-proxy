@@ -1,0 +1,1 @@
+function a(e,o){if(e==0)return"0 B";let t=1024,r=o||2,B=["B","KB","MB","GB","TB","PB","EB","ZB","YB"],l=Math.floor(Math.log(e)/Math.log(t));return parseFloat((e/Math.pow(t,l)).toFixed(r))+" "+B[l]}export{a as default};
