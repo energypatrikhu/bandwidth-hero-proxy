@@ -25,15 +25,15 @@ export default async function proxyBuffer(request: IncomingMessage, response: Se
 		return;
 	}
 
-	try {
-		let headers = {
-			..._.pick(request.headers, ['cookie', 'dnt', 'referer']),
-			'accept-encoding': '*',
-			'user-agent': 'Bandwidth-Hero Compressor',
-			'x-forwarded-for': request.headers['x-forwarded-for']?.toString()!,
-			'via': '1.1 bandwidth-hero',
-		};
+	let headers = {
+		..._.pick(request.headers, ['cookie', 'dnt', 'referer']),
+		'accept-encoding': '*',
+		'user-agent': 'Bandwidth-Hero Compressor',
+		'x-forwarded-for': request.headers['x-forwarded-for']?.toString()!,
+		'via': '1.1 bandwidth-hero',
+	};
 
+	try {
 		let netResponse: AxiosResponse | null = await axios({
 			method: 'get',
 			headers,
@@ -142,7 +142,21 @@ export default async function proxyBuffer(request: IncomingMessage, response: Se
 				});
 			});
 	} catch (error: any) {
-		console.error('[proxy]', 'Cannot compress,', error.message ?? error);
+		console.error(' ');
+		console.error(
+			getCurrentTime(),
+			JSON.stringify(
+				{
+					params,
+					headers,
+					body: {
+						error: 'Cannot compress! ' + error.message ?? error,
+					},
+				},
+				null,
+				1,
+			).replace(/\"/g, ''),
+		);
 
 		return redirect(request, response, params);
 	} finally {
