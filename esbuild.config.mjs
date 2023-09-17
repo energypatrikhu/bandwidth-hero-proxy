@@ -35,7 +35,7 @@ await build({
 	logLevel: 'debug',
 	minify: true,
 	format: 'esm',
-	drop: ['console', 'debugger'],
+	// drop: ['console', 'debugger'],
 	treeShaking: true,
 	external: Object.keys(packageJson.dependencies || {}),
 	mangleQuoted: true,

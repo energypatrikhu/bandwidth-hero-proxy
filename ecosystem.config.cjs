@@ -3,7 +3,7 @@ module.exports = {
 		{
 			name: 'bandwidth-hero-proxy',
 			script: 'build/index.js',
-			node_args: '--expose-gc',
+			node_args: '--expose-gc --max-old-space-size=128',
 		},
 	],
 };

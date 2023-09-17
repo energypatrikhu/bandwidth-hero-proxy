@@ -1,18 +1,26 @@
-import express from 'express';
+import { createServer } from 'http';
 
-import paramsParser from './paramsParser.js';
-import proxy from './proxy-stream.js';
+import compress from './compress.js';
 
-let app = express();
+createServer(function (request, response) {
+	let url = new URL('http://' + request.headers['host']! + request.url);
 
-let PORT = process.env.PORT || 16406;
+	let path = url.pathname.endsWith('/') ? url.pathname.slice(-1) : url.pathname;
 
-app.enable('trust proxy');
-app.get('/', paramsParser, proxy);
-app.get('/favicon.ico', (_, res) => res.status(204).end());
-app.listen(PORT, () => console.log(`Listening on ${PORT}`));
-
-setInterval(() => {
-	if (gc) gc();
-	if (global.gc) global.gc();
-}, 1000);
+	switch (path) {
+		case '/': {
+			compress(request, response);
+			break;
+		}
+		case '/favicon.ico': {
+			response.statusCode = 204;
+			response.end();
+			break;
+		}
+		default: {
+			response.statusCode = 404;
+			response.end();
+			break;
+		}
+	}
+}).listen(16406);

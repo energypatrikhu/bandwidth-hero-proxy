@@ -1,10 +1,10 @@
 import { AxiosResponse } from 'axios';
-import { Response } from 'express';
+import { IncomingMessage, ServerResponse } from 'http';
 
-export default function copyHeaders(source: AxiosResponse, target: Response) {
+export default function copyHeaders(source: AxiosResponse, response: ServerResponse<IncomingMessage>) {
 	for (let [key, value] of Object.entries(source.headers)) {
 		try {
-			target.setHeader(key, value);
+			response.setHeader(key, value?.toString()!);
 		} catch (e) {
 			console.log(e);
 		}

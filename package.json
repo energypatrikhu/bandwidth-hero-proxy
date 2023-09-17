@@ -5,24 +5,29 @@
 	"license": "MIT",
 	"type": "module",
 	"scripts": {
-		"build": "npm up && node ./esbuild.config.mjs && pm2 restart ecosystem.config.cjs"
+		"build": "node ./esbuild.config.mjs && pm2 restart ecosystem.config.cjs"
 	},
 	"dependencies": {
-		"axios": "latest",
-		"esbuild": "latest",
-		"express": "latest",
-		"image-type": "latest",
-		"lodash": "latest",
-		"sharp": "latest",
-		"typescript": "latest",
-		"user-agents": "latest"
+		"axios": "^1.2.0-alpha.1",
+		"buffer-to-stream": "^1.0.0",
+		"esbuild": "^0.19.3",
+		"express": "^5.0.0-beta.1",
+		"fastify": "^4.23.2",
+		"image-type": "^5.2.0",
+		"lodash": "^4.17.21",
+		"sharp": "^0.32.5",
+		"throttle": "^1.0.3",
+		"typescript": "^5.3.0-dev.20230915",
+		"user-agents": "^1.0.1444"
 	},
 	"devDependencies": {
+		"@types/buffer-to-stream": "^1.0.1",
 		"@types/express": "latest",
 		"@types/image-type": "latest",
 		"@types/lodash": "latest",
 		"@types/node": "latest",
 		"@types/sharp": "latest",
+		"@types/throttle": "^1.0.2",
 		"@types/user-agents": "latest"
 	}
 }

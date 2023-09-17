@@ -1,16 +1,22 @@
-import { Request, Response } from 'express';
+import { IncomingMessage, ServerResponse } from 'http';
 
-export default function redirect(req: Request, res: Response) {
-	if (res.headersSent) return;
+export default function redirect(request: IncomingMessage, response: ServerResponse<IncomingMessage>, params: any) {
+	if (response.headersSent) return;
 
-	res.setHeader('content-length', 0);
-	res.removeHeader('cache-control');
-	res.removeHeader('expires');
-	res.removeHeader('date');
-	res.removeHeader('etag');
-	res.setHeader('location', encodeURI(req.params.url));
-	res.status(302).end();
+	response.setHeader('content-length', 0);
+	response.removeHeader('cache-control');
+	response.removeHeader('expires');
+	response.removeHeader('date');
+	response.removeHeader('etag');
+	response.setHeader('location', encodeURI(params.url));
+	response.statusCode = 302;
+
+	response.end();
+	response.flushHeaders();
+	response.destroy();
+	request.drop(Infinity);
+	request.destroy();
 
 	if (gc) gc();
-	if (global.gc) global.gc();
+	else if (global.gc) global.gc();
 }
