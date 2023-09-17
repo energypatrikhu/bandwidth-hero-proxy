@@ -102,3 +102,6 @@ kívánt kép requestnél:
 tesztelésre:
   használd a bandwidth-hero-proxy extension-t a böngészőben
   https://chrome.google.com/webstore/detail/bandwidth-hero-live-image/mmhippoadkhcflebgghophicgldbahdb
+
++ kód: (hátha segít)
+  https://github.com/energypatrikhu/bandwidth-hero-proxy
