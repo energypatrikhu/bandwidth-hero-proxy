@@ -1,1 +1,0 @@
-function r(a,e,t){e.headersSent||(e.setHeader("content-length",0),e.removeHeader("cache-control"),e.removeHeader("expires"),e.removeHeader("date"),e.removeHeader("etag"),e.setHeader("location",encodeURI(t.url)),e.statusCode=302,e.end(),e.flushHeaders(),e.destroy(),a.drop(1/0),a.destroy(),gc?gc():global.gc&&global.gc())}export{r as default};

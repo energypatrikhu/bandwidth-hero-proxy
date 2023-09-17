@@ -1,1 +1,0 @@
-function a(t){let e=new URL("http://"+t.headers.host+t.url).searchParams,r=e.get("url");return Array.isArray(r)&&(r=r.join("&url=")),r?(r=r.replace(/http:\/\/1\.1\.\d\.\d\/bmi\/(https?:\/\/)?/i,"http://"),{url:r,format:e.get("jpg")!="1"?"webp":"jpeg",grayscale:e.get("bw")!="0",quality:parseInt(e.get("l"))}):"bandwidth-hero-proxy"}export{a as default};
