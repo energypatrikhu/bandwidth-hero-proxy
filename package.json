@@ -1,33 +1,29 @@
 {
 	"name": "bandwidth-hero-proxy",
-	"main": "server.js",
+	"main": "build/index.js",
 	"private": true,
 	"license": "MIT",
 	"type": "module",
 	"scripts": {
-		"build": "node ./esbuild.config.mjs && pm2 restart ecosystem.config.cjs"
+		"olddocker:build": "node ./esbuild.config.mjs && docker build -t registry.gitlab.com/energy-docker/bandwidth-hero-proxy .",
+		"olddocker:push": "docker push registry.gitlab.com/energy-docker/bandwidth-hero-proxy",
+		"docker:build": "node ./esbuild.config.mjs && docker build -t energyhun24/bandwidth-hero-proxy .",
+		"docker:push": "docker push energyhun24/bandwidth-hero-proxy"
 	},
 	"dependencies": {
-		"axios": "^1.2.0-alpha.1",
-		"buffer-to-stream": "^1.0.0",
-		"esbuild": "^0.19.3",
-		"express": "^5.0.0-beta.1",
-		"fastify": "^4.23.2",
-		"image-type": "^5.2.0",
+		"esbuild": "^0.19.5",
+		"express": "^4.18.2",
 		"lodash": "^4.17.21",
-		"sharp": "^0.32.5",
-		"throttle": "^1.0.3",
-		"typescript": "^5.3.0-dev.20230915",
-		"user-agents": "^1.0.1444"
+		"sharp": "^0.32.6",
+		"superagent": "^8.1.2",
+		"typescript": "^5.2.2",
+		"user-agents": "^1.1.2"
 	},
 	"devDependencies": {
-		"@types/buffer-to-stream": "^1.0.1",
-		"@types/express": "latest",
-		"@types/image-type": "latest",
-		"@types/lodash": "latest",
-		"@types/node": "latest",
-		"@types/sharp": "latest",
-		"@types/throttle": "^1.0.2",
-		"@types/user-agents": "latest"
+		"@types/express": "^4.17.20",
+		"@types/lodash": "^4.14.200",
+		"@types/node": "^20.8.8",
+		"@types/superagent": "^4.1.20",
+		"@types/user-agents": "^1.0.3"
 	}
 }

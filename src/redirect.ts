@@ -1,6 +1,6 @@
 import { IncomingMessage, ServerResponse } from 'http';
 
-export default function redirect(request: IncomingMessage, response: ServerResponse<IncomingMessage>, params: any) {
+export function redirect({ request, response, params }: { request: IncomingMessage; response: ServerResponse<IncomingMessage>; params: any }) {
 	if (response.headersSent) return;
 
 	response.setHeader('content-length', 0);
@@ -14,9 +14,8 @@ export default function redirect(request: IncomingMessage, response: ServerRespo
 	response.end();
 	response.flushHeaders();
 	response.destroy();
+	response = null;
 	request.drop(Infinity);
 	request.destroy();
-
-	if (gc) gc();
-	else if (global.gc) global.gc();
+	request = null;
 }

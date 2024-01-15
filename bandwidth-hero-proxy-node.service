@@ -1,0 +1,17 @@
+[Unit]
+Description=Bandwidth Hero Proxy (Node)
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=on-failure
+RestartSec=3
+User=root
+ExecStart=/usr/bin/node --expose-gc --max-old-space-size=128 --jitless --no-opt --no-concurrent-recompilation --noexpose_wasm --max-semi-space-size=4 ./build/index.js
+WorkingDirectory=/mnt/web/node-scripts/bandwidth-hero-proxy
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

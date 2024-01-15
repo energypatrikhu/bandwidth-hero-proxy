@@ -1,26 +1,22 @@
-import { createServer } from 'http';
+import express from 'express';
+import { cpus } from 'os';
+import sharp from 'sharp';
 
-import compress from './compress.js';
+import { paramsParser } from './paramsParser.js';
+import { proxy } from './proxy.js';
 
-createServer(function (request, response) {
-	let url = new URL('http://' + request.headers['host']! + request.url);
+sharp.cache(false);
+sharp.simd(true);
+sharp.concurrency(cpus().length);
 
-	let path = url.pathname.endsWith('/') ? url.pathname.slice(-1) : url.pathname;
+const server = express();
+const PORT = 80;
 
-	switch (path) {
-		case '/': {
-			compress(request, response);
-			break;
-		}
-		case '/favicon.ico': {
-			response.statusCode = 204;
-			response.end();
-			break;
-		}
-		default: {
-			response.statusCode = 404;
-			response.end();
-			break;
-		}
-	}
-}).listen(16406);
+server.get('/', paramsParser, proxy);
+server.get('/favicon.ico', (req, res) => res.status(204).end());
+server.listen(PORT, () => console.log(`Listening on ${PORT}`));
+
+setInterval(function () {
+	if (gc) gc();
+	else if (global.gc) global.gc();
+}, 5000);

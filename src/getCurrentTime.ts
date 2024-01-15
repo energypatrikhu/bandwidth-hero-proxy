@@ -1,4 +1,4 @@
-export default function getCurrentTime() {
+export function getCurrentTime() {
 	return new Intl.DateTimeFormat('hu-HU', {
 		timeZone: 'Europe/Budapest',
 		year: 'numeric',

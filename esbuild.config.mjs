@@ -17,19 +17,12 @@ if (existsSync(__destination)) {
 }
 
 console.log('Building files...');
-let entries = (await readdir(__source, { withFileTypes: true }))
-	.filter(function (entry) {
-		return entry.isFile();
-	})
-	.map(function (entry) {
-		return join(__source, entry.name);
-	});
 
 let packageJson = JSON.parse(await readFile('./package.json', { encoding: 'utf-8' }));
 
 await build({
 	bundle: true,
-	entryPoints: entries,
+	entryPoints: ['./src/index.ts'],
 	platform: 'node',
 	outdir: __destination,
 	logLevel: 'debug',

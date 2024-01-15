@@ -1,8 +1,8 @@
-import { AxiosResponse } from 'axios';
-import { IncomingMessage, ServerResponse } from 'http';
+import { Response } from 'express';
+import superagent from 'superagent';
 
-export default function copyHeaders(source: AxiosResponse, response: ServerResponse<IncomingMessage>) {
-	for (let [key, value] of Object.entries(source.headers)) {
+export function copyHeaders({ source, response }: { source: superagent.Response; response: Response }) {
+	for (const [key, value] of Object.entries(source.headers)) {
 		try {
 			response.setHeader(key, value?.toString()!);
 		} catch (e) {
