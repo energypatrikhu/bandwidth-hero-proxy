@@ -110,7 +110,7 @@ export function proxy(request: Request, response: Response) {
 					params: request.params,
 					headers,
 					body: {
-						error: 'Cannot compress! ' + reason.message ?? reason,
+						error: 'Cannot compress! ' + (reason.message ?? reason),
 					},
 				},
 				null,
