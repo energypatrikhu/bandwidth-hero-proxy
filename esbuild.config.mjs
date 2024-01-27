@@ -3,7 +3,7 @@ import { existsSync } from 'fs';
 import { mkdir, readdir, rm, readFile } from 'fs/promises';
 import { join } from 'path';
 
-let __source = './src';
+// let __source = './src';
 let __destination = './build';
 
 if (existsSync(__destination)) {
@@ -28,7 +28,7 @@ await build({
 	logLevel: 'debug',
 	minify: true,
 	format: 'esm',
-	// drop: ['console', 'debugger'],
+	drop: ['console', 'debugger'],
 	treeShaking: true,
 	external: Object.keys(packageJson.dependencies || {}),
 	mangleQuoted: true,
