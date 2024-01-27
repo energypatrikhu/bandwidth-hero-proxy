@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 
 export function paramsParser(request: Request, response: Response, next: NextFunction) {
-	let url = request.query.url.toString();
+	let url = (request.query.url ?? '').toString();
 
 	if (Array.isArray(url)) url = url.join('&url=');
 	if (!url) return response.send('bandwidth-hero-proxy');
