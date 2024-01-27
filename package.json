@@ -11,19 +11,19 @@
 		"old.docker:push": "docker push energyhun24/bandwidth-hero-proxy"
 	},
 	"dependencies": {
-		"esbuild": "latest",
-		"express": "latest",
-		"lodash": "latest",
-		"sharp": "latest",
-		"superagent": "latest",
-		"typescript": "latest",
-		"user-agents": "latest"
+		"esbuild": "^0.20.0",
+		"express": "^4.18.2",
+		"lodash": "^4.17.21",
+		"sharp": "^0.33.2",
+		"superagent": "^8.1.2",
+		"typescript": "^5.3.3",
+		"user-agents": "^1.1.97"
 	},
 	"devDependencies": {
-		"@types/express": "^4.17.20",
-		"@types/lodash": "^4.14.200",
-		"@types/node": "^20.8.8",
-		"@types/superagent": "^4.1.20",
-		"@types/user-agents": "^1.0.3"
+		"@types/express": "^4.17.21",
+		"@types/lodash": "^4.14.202",
+		"@types/node": "^20.11.8",
+		"@types/superagent": "^8.1.3",
+		"@types/user-agents": "^1.0.4"
 	}
 }
