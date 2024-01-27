@@ -5,10 +5,10 @@
 	"license": "MIT",
 	"type": "module",
 	"scripts": {
-		"olddocker:build": "node ./esbuild.config.mjs && docker build -t registry.gitlab.com/energy-docker/bandwidth-hero-proxy .",
-		"olddocker:push": "docker push registry.gitlab.com/energy-docker/bandwidth-hero-proxy",
-		"docker:build": "node ./esbuild.config.mjs && docker build -t energyhun24/bandwidth-hero-proxy .",
-		"docker:push": "docker push energyhun24/bandwidth-hero-proxy"
+		"old.old.docker:build": "node ./esbuild.config.mjs && docker build -t registry.gitlab.com/energy-docker/bandwidth-hero-proxy .",
+		"old.old.docker:push": "docker push registry.gitlab.com/energy-docker/bandwidth-hero-proxy",
+		"docker:build": "node ./esbuild.config.mjs && docker build -t bandwidth-hero-proxy .",
+		"old.docker:push": "docker push energyhun24/bandwidth-hero-proxy"
 	},
 	"dependencies": {
 		"esbuild": "latest",
