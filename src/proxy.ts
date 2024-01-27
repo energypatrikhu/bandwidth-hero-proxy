@@ -21,7 +21,7 @@ export function proxy(request: Request, response: Response) {
 		'expires': '0',
 		'connection': 'close',
 		'vary': '*',
-	};
+	} satisfies Record<string, string>;
 
 	const Superagent = superagent('get', request.params.url);
 	Superagent.set(headers);
