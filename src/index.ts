@@ -10,11 +10,11 @@ sharp.simd(true);
 sharp.concurrency(cpus().length);
 
 const server = express();
-const PORT = 80;
+const port = process.env.PORT || 80;
 
 server.get('/', paramsParser, proxy);
 server.get('/favicon.ico', (req, res) => res.status(204).end());
-server.listen(PORT, () => console.log(`Listening on ${PORT}`));
+server.listen(port, () => console.log(`Listening on ${port}`));
 
 setInterval(function () {
 	if (gc) gc();
