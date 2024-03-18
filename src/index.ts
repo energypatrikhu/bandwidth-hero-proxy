@@ -13,7 +13,7 @@ const server = express();
 const port = process.env.PORT || 80;
 
 server.get('/', paramsParser, proxy);
-server.get('/favicon.ico', (req, res) => res.status(204).end());
+server.get('/favicon.ico', (_req, res) => res.status(204).end());
 server.listen(port, () => console.log(`Listening on ${port}`));
 
 setInterval(function () {
