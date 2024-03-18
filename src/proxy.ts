@@ -9,7 +9,7 @@ import { getCurrentTime } from './getCurrentTime.js';
 import { redirect } from './redirect.js';
 import { tryCompress } from './tryCompress.js';
 
-export function proxy(request: Request, response: Response) {
+export async function proxy(request: Request, response: Response) {
 	const headers = {
 		..._.pick(request.headers, ['cookie', 'dnt', 'referer']),
 		'accept-encoding': '*',
@@ -23,15 +23,11 @@ export function proxy(request: Request, response: Response) {
 		'vary': '*',
 	} satisfies Record<string, string>;
 
-	const Superagent = superagent('get', request.params.url);
-	Superagent.set(headers);
-	Superagent.withCredentials();
-	Superagent.responseType('arraybuffer');
-	Superagent.buffer(true);
+	try {
+		const netResponse = await superagent.get(request.params.url).set(headers).withCredentials().responseType('arraybuffer').buffer(true);
 
-	Superagent.then(async function (netResponse) {
 		const mediaSize = netResponse.body.length;
-		const compressedImage = await tryCompress(netResponse.body, request.params, mediaSize);
+		const compressedImage = await tryCompress(netResponse.body, request.params);
 		const savedSize = mediaSize - compressedImage.size;
 
 		copyHeaders({ source: netResponse, response });
@@ -46,6 +42,7 @@ export function proxy(request: Request, response: Response) {
 		response.setHeader('x-bytes-saved', savedSize);
 		response.setHeader('connection', 'close');
 		response.status(200).send(compressedImage.buffer);
+
 		response.end(function () {
 			const memoryData = process.memoryUsage();
 			const heapStatistics = getHeapStatistics();
@@ -101,7 +98,7 @@ export function proxy(request: Request, response: Response) {
 			if (gc) gc();
 			else if (global.gc) global.gc();
 		});
-	}).catch(function (reason) {
+	} catch (reason) {
 		console.error(' ');
 		console.error(
 			getCurrentTime(),
@@ -122,5 +119,5 @@ export function proxy(request: Request, response: Response) {
 		else if (global.gc) global.gc();
 
 		return redirect({ request, response, params: request.params });
-	});
+	}
 }
