@@ -3,11 +3,11 @@ import _ from 'lodash';
 import superagent from 'superagent';
 import { getHeapSpaceStatistics, getHeapStatistics } from 'v8';
 
+import { compress } from './compress.js';
 import { convertFileSize } from './convertFileSize.js';
 import { copyHeaders } from './copyHeaders.js';
 import { getCurrentTime } from './getCurrentTime.js';
 import { redirect } from './redirect.js';
-import { tryCompress } from './tryCompress.js';
 
 export async function proxy(request: Request, response: Response) {
 	const headers = {
@@ -27,7 +27,7 @@ export async function proxy(request: Request, response: Response) {
 		const netResponse = await superagent.get(request.params.url).set(headers).withCredentials().responseType('arraybuffer').buffer(true);
 
 		const mediaSize = netResponse.body.length;
-		const compressedImage = await tryCompress(netResponse.body, request.params);
+		const compressedImage = await compress(netResponse.body, request.params);
 		const savedSize = mediaSize - compressedImage.size;
 
 		copyHeaders({ source: netResponse, response });
