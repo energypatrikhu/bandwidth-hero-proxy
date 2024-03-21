@@ -5,9 +5,10 @@
 	"license": "MIT",
 	"type": "module",
 	"scripts": {
-		"docker": "node ./esbuild.config.mjs && npm run docker:build && npm run docker:push",
+		"build": "node ./esbuild.config.mjs",
+		"docker": "npm run build && npm run docker:build && npm run docker:push",
 		"docker:build": "docker build -t energyhun24/bandwidth-hero-proxy .",
-		"docker:push": "docker push energyhun24/bandwidth-hero-proxy"
+		"docker:push": "docker push energyhun24/bandwidth-hero-proxy:latest"
 	},
 	"dependencies": {
 		"esbuild": "^0.20.1",
