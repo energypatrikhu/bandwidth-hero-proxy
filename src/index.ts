@@ -1,12 +1,12 @@
 import cluster from 'cluster';
 import express from 'express';
-import { availableParallelism, cpus } from 'os';
+import { cpus } from 'os';
 import sharp from 'sharp';
 
 import { paramsParser } from './paramsParser.js';
 import { proxy } from './proxy.js';
 
-const numOfCpus = availableParallelism();
+const numOfCpus = cpus().length;
 
 if (cluster.isPrimary) {
 	for (let i = 0; i < numOfCpus; i++) {
@@ -20,7 +20,7 @@ if (cluster.isPrimary) {
 } else {
 	sharp.cache(false);
 	sharp.simd(true);
-	sharp.concurrency(cpus().length);
+	sharp.concurrency(numOfCpus);
 
 	const server = express();
 	const port = process.env.PORT || 80;
