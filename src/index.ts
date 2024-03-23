@@ -1,15 +1,17 @@
 import express from 'express';
 import cluster from 'node:cluster';
-import { cpus } from 'node:os';
+import { availableParallelism } from 'node:os';
 import process from 'node:process';
 import sharp from 'sharp';
 
 import { paramsParser } from './paramsParser.js';
 import { proxy } from './proxy.js';
 
-const numOfCpus = cpus().length;
+const numOfCpus = availableParallelism();
 
 if (cluster.isPrimary) {
+	console.log(`Primary ${process.pid} is running`);
+
 	for (let i = 0; i < numOfCpus; i++) {
 		cluster.fork();
 	}
