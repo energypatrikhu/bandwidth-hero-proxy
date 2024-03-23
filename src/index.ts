@@ -1,7 +1,7 @@
-import cluster from 'cluster';
 import express from 'express';
+import cluster from 'node:cluster';
+import { cpus } from 'node:os';
 import process from 'node:process';
-import { cpus } from 'os';
 import sharp from 'sharp';
 
 import { paramsParser } from './paramsParser.js';
