@@ -1,5 +1,6 @@
 import cluster from 'cluster';
 import express from 'express';
+import process from 'node:process';
 import { cpus } from 'os';
 import sharp from 'sharp';
 
@@ -27,7 +28,9 @@ if (cluster.isPrimary) {
 
 	server.get('/', paramsParser, proxy);
 	server.get('/favicon.ico', (_req, res) => res.status(204).end());
-	server.listen(port, () => console.log(`Listening on ${port}`));
+	server.listen(port, () => {
+		console.log(`Worker ${process.pid} listening on ${port}`);
+	});
 
 	setInterval(function () {
 		if (gc) gc();
