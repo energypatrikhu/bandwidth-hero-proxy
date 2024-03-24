@@ -34,10 +34,6 @@ export async function proxy(request: Request, response: Response) {
 		response.setHeader('content-encoding', 'identity');
 		response.setHeader('content-type', `image/${request.params.format}`);
 		response.setHeader('content-length', compressedImage.size);
-		response.setHeader('cache-control', 'private, no-cache, no-store, must-revalidate, max-age=0, proxy-revalidate, s-maxage=0');
-		response.setHeader('pragma', 'no-cache');
-		response.setHeader('expires', '0');
-		response.setHeader('vary', '*');
 		response.setHeader('x-original-size', mediaSize);
 		response.setHeader('x-bytes-saved', savedSize);
 		response.setHeader('connection', 'close');
