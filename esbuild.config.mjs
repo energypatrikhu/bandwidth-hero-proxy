@@ -1,35 +1,45 @@
 import { build } from 'esbuild';
 import { existsSync } from 'fs';
-import { mkdir, readdir, rm, readFile } from 'fs/promises';
+import { readdir, rm, mkdir, readFile } from 'fs/promises';
 import { join } from 'path';
 
-// let __source = './src';
-let __destination = './build';
+const __destination = './build';
 
-if (existsSync(__destination)) {
+async function removeOldFiles() {
 	console.log('Removing old files...');
 
-	for await (let entry of await readdir(__destination, { withFileTypes: true })) {
+	const files = await readdir(__destination, { withFileTypes: true });
+	for await (const entry of files) {
 		await rm(join(__destination, entry.name), { force: true, recursive: true });
 	}
-} else {
-	await mkdir(__destination);
 }
 
-console.log('Building files...');
+async function buildFiles() {
+	console.log('Building files...');
 
-let packageJson = JSON.parse(await readFile('./package.json', { encoding: 'utf-8' }));
+	const packageJson = JSON.parse(await readFile('./package.json', { encoding: 'utf-8' }));
 
-await build({
-	bundle: true,
-	entryPoints: ['./src/index.ts'],
-	platform: 'node',
-	outdir: __destination,
-	logLevel: 'debug',
-	minify: true,
-	format: 'esm',
-	drop: ['console', 'debugger'],
-	treeShaking: true,
-	external: Object.keys(packageJson.dependencies || {}),
-	mangleQuoted: true,
-});
+	await build({
+		bundle: true,
+		entryPoints: ['./src/index.ts'],
+		platform: 'node',
+		outdir: __destination,
+		logLevel: 'debug',
+		minify: true,
+		format: 'esm',
+		drop: ['console', 'debugger'],
+		treeShaking: true,
+		external: Object.keys(packageJson.dependencies || {}),
+		mangleQuoted: true,
+	});
+}
+
+(async function () {
+	if (existsSync(__destination)) {
+		await removeOldFiles();
+	} else {
+		await mkdir(__destination);
+	}
+
+	await buildFiles();
+})();
