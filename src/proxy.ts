@@ -9,14 +9,15 @@ import { copyHeaders } from './copyHeaders.js';
 import { getCurrentTime } from './getCurrentTime.js';
 import { redirect } from './redirect.js';
 
-export async function proxy(request: Request, response: Response) {
+export const proxy = async (request: Request, response: Response) => {
 	const headers = {
 		..._.pick(request.headers, ['cookie', 'dnt', 'referer']),
 		'accept-encoding': '*',
 		'user-agent': 'Bandwidth-Hero Compressor',
 		'x-forwarded-for': request.headers['x-forwarded-for']?.toString()!,
 		'via': '1.1 bandwidth-hero',
-		'cache-control': 'private, no-cache, no-store, must-revalidate, max-age=0, proxy-revalidate, s-maxage=0',
+		'cache-control':
+			'private, no-cache, no-store, must-revalidate, max-age=0, proxy-revalidate, s-maxage=0',
 		'pragma': 'no-cache',
 		'expires': '0',
 		'connection': 'close',
@@ -24,10 +25,18 @@ export async function proxy(request: Request, response: Response) {
 	} satisfies Record<string, string>;
 
 	try {
-		const netResponse = await superagent.get(request.params.url).set(headers).withCredentials().responseType('arraybuffer').buffer(true);
+		const netResponse = await superagent
+			.get(request.params.url)
+			.set(headers)
+			.withCredentials()
+			.responseType('arraybuffer')
+			.buffer(true);
 
 		const mediaSize = netResponse.body.length;
-		const compressedImage = await compress(netResponse.body, request.params);
+		const compressedImage = await compress(
+			netResponse.body,
+			request.params,
+		);
 		const savedSize = mediaSize - compressedImage.size;
 
 		copyHeaders({ source: netResponse, response });
@@ -39,7 +48,7 @@ export async function proxy(request: Request, response: Response) {
 		response.setHeader('connection', 'close');
 		response.status(200).send(compressedImage.buffer);
 
-		response.end(function () {
+		response.end(() => {
 			const memoryData = process.memoryUsage();
 			const heapStatistics = getHeapStatistics();
 			const heapSpaceStatistics = getHeapSpaceStatistics();
@@ -49,10 +58,14 @@ export async function proxy(request: Request, response: Response) {
 				heapStats[key] = convertFileSize({ bytes: memoryData[key] });
 			}
 			for (const key in heapStatistics) {
-				heapStats[key] = convertFileSize({ bytes: heapStatistics[key] });
+				heapStats[key] = convertFileSize({
+					bytes: heapStatistics[key],
+				});
 			}
 			for (const { space_name, space_used_size } of heapSpaceStatistics) {
-				heapStats[space_name] = convertFileSize({ bytes: space_used_size });
+				heapStats[space_name] = convertFileSize({
+					bytes: space_used_size,
+				});
 			}
 
 			console.log(' ');
@@ -67,7 +80,9 @@ export async function proxy(request: Request, response: Response) {
 						headers,
 						body: {
 							originalSize: convertFileSize({ bytes: mediaSize }),
-							compressedSize: convertFileSize({ bytes: compressedImage.size }),
+							compressedSize: convertFileSize({
+								bytes: compressedImage.size,
+							}),
 							savedSize: convertFileSize({ bytes: savedSize }),
 						},
 						heapStats,
@@ -116,4 +131,4 @@ export async function proxy(request: Request, response: Response) {
 
 		return redirect({ request, response, params: request.params });
 	}
-}
+};

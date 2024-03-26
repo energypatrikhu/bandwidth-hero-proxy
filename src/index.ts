@@ -34,7 +34,7 @@ if (cluster.isPrimary) {
 		console.log(`Worker ${process.pid} listening on ${port}`);
 	});
 
-	setInterval(function () {
+	setInterval(() => {
 		if (gc) gc();
 		else if (global.gc) global.gc();
 	}, 5000);

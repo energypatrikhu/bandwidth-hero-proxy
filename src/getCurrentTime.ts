@@ -1,4 +1,4 @@
-export function getCurrentTime() {
+export const getCurrentTime = () => {
 	return new Intl.DateTimeFormat('hu-HU', {
 		timeZone: 'Europe/Budapest',
 		year: 'numeric',
@@ -8,4 +8,4 @@ export function getCurrentTime() {
 		minute: '2-digit',
 		second: '2-digit',
 	}).format(new Date());
-}
+};

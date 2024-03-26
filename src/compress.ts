@@ -1,6 +1,6 @@
 import sharp from 'sharp';
 
-export async function compress(originalImageBuffer: Buffer, params: any) {
+export const compress = async (originalImageBuffer: Buffer, params: any) => {
 	try {
 		const { format, grayscale, quality } = params;
 
@@ -25,4 +25,4 @@ export async function compress(originalImageBuffer: Buffer, params: any) {
 	} catch (error) {
 		throw error ?? new Error('This should not happen');
 	}
-}
+};

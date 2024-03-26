@@ -1,6 +1,14 @@
 import { IncomingMessage, ServerResponse } from 'http';
 
-export function redirect({ request, response, params }: { request: IncomingMessage; response: ServerResponse<IncomingMessage>; params: any }) {
+export const redirect = ({
+	request,
+	response,
+	params,
+}: {
+	request: IncomingMessage;
+	response: ServerResponse<IncomingMessage>;
+	params: any;
+}) => {
 	if (response.headersSent) return;
 
 	response.writeHead(302, {
@@ -10,4 +18,4 @@ export function redirect({ request, response, params }: { request: IncomingMessa
 
 	response.end();
 	request.destroy();
-}
+};

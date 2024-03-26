@@ -1,6 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 
-export function paramsParser(request: Request, response: Response, next: NextFunction) {
+export const paramsParser = (
+	request: Request,
+	response: Response,
+	next: NextFunction,
+) => {
 	let url = (request.query.url ?? '').toString();
 
 	if (Array.isArray(url)) {
@@ -18,4 +22,4 @@ export function paramsParser(request: Request, response: Response, next: NextFun
 	request.params.quality = parseInt(request.query.l.toString()) as any;
 
 	next();
-}
+};
