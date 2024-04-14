@@ -110,8 +110,9 @@ export const proxy = async (request: Request, response: Response) => {
 			else if (global.gc) global.gc();
 		});
 	} catch (reason) {
-		console.error(' ');
-		console.error(
+		logger('error', ' ');
+		logger(
+			'error',
 			getCurrentTime(),
 			JSON.stringify(
 				{
