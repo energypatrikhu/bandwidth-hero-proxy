@@ -6,8 +6,8 @@ import { getHeapSpaceStatistics, getHeapStatistics } from 'v8';
 import { compress } from './compress.js';
 import { convertFileSize } from './convertFileSize.js';
 import { copyHeaders } from './copyHeaders.js';
-import { getCurrentTime } from './getCurrentTime.js';
 import { redirect } from './redirect.js';
+import { getCurrentTime } from '@energypatrikhu/node-utils';
 
 export const proxy = async (request: Request, response: Response) => {
 	const headers = {
