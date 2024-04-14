@@ -6,7 +6,11 @@ import { getHeapSpaceStatistics, getHeapStatistics } from 'v8';
 import { compress } from './compress.js';
 import { copyHeaders } from './copyHeaders.js';
 import { redirect } from './redirect.js';
-import { getCurrentTime, convertFileSize } from '@energypatrikhu/node-utils';
+import {
+	getCurrentTime,
+	convertFileSize,
+	logger,
+} from '@energypatrikhu/node-utils';
 
 export const proxy = async (request: Request, response: Response) => {
 	const headers = {
@@ -63,8 +67,9 @@ export const proxy = async (request: Request, response: Response) => {
 				heapStats[space_name] = convertFileSize(space_used_size);
 			}
 
-			console.log(' ');
-			console.log(
+			logger('info', ' ');
+			logger(
+				'info',
 				getCurrentTime(),
 				JSON.stringify(
 					{

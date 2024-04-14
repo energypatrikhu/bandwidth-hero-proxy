@@ -1,3 +1,4 @@
+import { logger } from '@energypatrikhu/node-utils';
 import { Response } from 'express';
 import superagent from 'superagent';
 
@@ -12,7 +13,7 @@ export const copyHeaders = ({
 		try {
 			response.setHeader(key, value?.toString()!);
 		} catch (e) {
-			console.log(e);
+			logger('error', e);
 		}
 	}
 };

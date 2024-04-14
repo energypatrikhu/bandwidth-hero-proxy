@@ -6,18 +6,19 @@ import sharp from 'sharp';
 
 import { paramsParser } from './paramsParser.js';
 import { proxy } from './proxy.js';
+import { logger } from '@energypatrikhu/node-utils';
 
 const numOfCpus = availableParallelism();
 
 if (cluster.isPrimary) {
-	console.log(`Primary ${process.pid} is running`);
+	logger('info', `Primary ${process.pid} is running`);
 
 	for (let i = 0; i < numOfCpus; i++) {
 		cluster.fork();
 	}
 
 	cluster.on('exit', (worker) => {
-		console.log(`Worker ${worker.process.pid} died`);
+		logger('warn', `Worker ${worker.process.pid} died`);
 		cluster.fork();
 	});
 } else {
@@ -31,7 +32,7 @@ if (cluster.isPrimary) {
 	server.get('/', paramsParser, proxy);
 	server.get('/favicon.ico', (_req, res) => res.status(204).end());
 	server.listen(port, () => {
-		console.log(`Worker ${process.pid} listening on ${port}`);
+		logger('info', `Worker ${process.pid} listening on ${port}`);
 	});
 
 	setInterval(() => {
