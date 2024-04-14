@@ -4,10 +4,9 @@ import superagent from 'superagent';
 import { getHeapSpaceStatistics, getHeapStatistics } from 'v8';
 
 import { compress } from './compress.js';
-import { convertFileSize } from './convertFileSize.js';
 import { copyHeaders } from './copyHeaders.js';
 import { redirect } from './redirect.js';
-import { getCurrentTime } from '@energypatrikhu/node-utils';
+import { getCurrentTime, convertFileSize } from '@energypatrikhu/node-utils';
 
 export const proxy = async (request: Request, response: Response) => {
 	const headers = {
@@ -55,17 +54,13 @@ export const proxy = async (request: Request, response: Response) => {
 
 			const heapStats = {};
 			for (const key in memoryData) {
-				heapStats[key] = convertFileSize({ bytes: memoryData[key] });
+				heapStats[key] = convertFileSize(memoryData[key]);
 			}
 			for (const key in heapStatistics) {
-				heapStats[key] = convertFileSize({
-					bytes: heapStatistics[key],
-				});
+				heapStats[key] = convertFileSize(heapStatistics[key]);
 			}
 			for (const { space_name, space_used_size } of heapSpaceStatistics) {
-				heapStats[space_name] = convertFileSize({
-					bytes: space_used_size,
-				});
+				heapStats[space_name] = convertFileSize(space_used_size);
 			}
 
 			console.log(' ');
@@ -79,11 +74,11 @@ export const proxy = async (request: Request, response: Response) => {
 						},
 						headers,
 						body: {
-							originalSize: convertFileSize({ bytes: mediaSize }),
-							compressedSize: convertFileSize({
-								bytes: compressedImage.size,
-							}),
-							savedSize: convertFileSize({ bytes: savedSize }),
+							originalSize: convertFileSize(mediaSize),
+							compressedSize: convertFileSize(
+								compressedImage.size,
+							),
+							savedSize: convertFileSize(savedSize),
 						},
 						heapStats,
 					},
