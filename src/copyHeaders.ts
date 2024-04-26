@@ -1,4 +1,4 @@
-import { logger } from '@energypatrikhu/node-utils';
+import { logger } from '@energypatrikhu/node-core-utils';
 import { Response } from 'express';
 import superagent from 'superagent';
 

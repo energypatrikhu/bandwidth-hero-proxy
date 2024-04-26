@@ -10,7 +10,7 @@ import {
 	getCurrentTime,
 	convertFileSize,
 	logger,
-} from '@energypatrikhu/node-utils';
+} from '@energypatrikhu/node-core-utils';
 
 export const proxy = async (request: Request, response: Response) => {
 	const headers = {

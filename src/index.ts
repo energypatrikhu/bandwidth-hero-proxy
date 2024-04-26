@@ -6,7 +6,7 @@ import sharp from 'sharp';
 
 import { paramsParser } from './paramsParser.js';
 import { proxy } from './proxy.js';
-import { logger } from '@energypatrikhu/node-utils';
+import { logger } from '@energypatrikhu/node-core-utils';
 
 const numOfCpus = availableParallelism();
 
