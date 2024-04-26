@@ -1,16 +1,12 @@
 import { Request, Response } from 'express';
 import _ from 'lodash';
 import superagent from 'superagent';
-import { getHeapSpaceStatistics, getHeapStatistics } from 'v8';
+import { getHeapSpaceStatistics, getHeapStatistics, type HeapInfo } from 'v8';
 
 import { compress } from './compress.js';
 import { copyHeaders } from './copyHeaders.js';
 import { redirect } from './redirect.js';
-import {
-	getCurrentTime,
-	convertFileSize,
-	logger,
-} from '@energypatrikhu/node-core-utils';
+import { convertFileSize, logger } from '@energypatrikhu/node-core-utils';
 
 export const proxy = async (request: Request, response: Response) => {
 	const headers = {
@@ -56,23 +52,26 @@ export const proxy = async (request: Request, response: Response) => {
 			const heapStatistics = getHeapStatistics();
 			const heapSpaceStatistics = getHeapSpaceStatistics();
 
-			const heapStats = {};
+			const heapStats: { [key: string]: string } = {};
 			for (const key in memoryData) {
-				heapStats[key] = convertFileSize(memoryData[key]);
+				heapStats[key] = convertFileSize(
+					memoryData[<keyof NodeJS.MemoryUsage>key],
+				);
 			}
 			for (const key in heapStatistics) {
-				heapStats[key] = convertFileSize(heapStatistics[key]);
+				heapStats[key] = convertFileSize(
+					heapStatistics[<keyof HeapInfo>key],
+				);
 			}
 			for (const { space_name, space_used_size } of heapSpaceStatistics) {
 				heapStats[space_name] = convertFileSize(space_used_size);
 			}
 
-			logger('info', ' ');
 			logger(
 				'info',
-				getCurrentTime(),
 				JSON.stringify(
 					{
+						worker: process.pid,
 						params: {
 							...request.params,
 							imgQuality: compressedImage.quality,
@@ -85,7 +84,7 @@ export const proxy = async (request: Request, response: Response) => {
 							),
 							savedSize: convertFileSize(savedSize),
 						},
-						heapStats,
+						// heapStats,
 					},
 					null,
 					1,
@@ -94,28 +93,25 @@ export const proxy = async (request: Request, response: Response) => {
 
 			response.flushHeaders();
 			response.destroy();
-			response = null;
 			request.drop(Infinity);
 			request.destroy();
-			request = null;
 
 			netResponse?.body.set([]);
 			netResponse?.body.fill(0);
-			netResponse!.body = null;
+			netResponse!.body = Buffer.alloc(0);
 			compressedImage.buffer.set([]);
 			compressedImage.buffer.fill(0);
-			compressedImage.buffer = null;
+			compressedImage.buffer = Buffer.alloc(0);
 
 			if (gc) gc();
 			else if (global.gc) global.gc();
 		});
-	} catch (reason) {
-		logger('error', ' ');
+	} catch (reason: any) {
 		logger(
 			'error',
-			getCurrentTime(),
 			JSON.stringify(
 				{
+					worker: process.pid,
 					params: request.params,
 					headers,
 					body: {

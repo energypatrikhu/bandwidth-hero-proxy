@@ -19,7 +19,7 @@ export const paramsParser = (
 	request.params.url = url;
 	request.params.format = request.query.jpg !== '1' ? 'webp' : 'jpeg';
 	request.params.grayscale = (request.query.bw !== '0') as any;
-	request.params.quality = parseInt(request.query.l.toString()) as any;
+	request.params.quality = parseInt(request.query.l?.toString()!) as any;
 
 	next();
 };

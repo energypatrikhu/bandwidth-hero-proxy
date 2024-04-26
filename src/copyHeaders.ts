@@ -13,7 +13,7 @@ export const copyHeaders = ({
 		try {
 			response.setHeader(key, value?.toString()!);
 		} catch (e) {
-			logger('error', e);
+			logger('error', { worker: process.pid }, e);
 		}
 	}
 };
