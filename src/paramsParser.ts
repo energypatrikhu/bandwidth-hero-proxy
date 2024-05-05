@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 
-export const paramsParser = (
+export default function paramsParser(
 	request: Request,
 	response: Response,
 	next: NextFunction,
-) => {
+) {
 	let url = (request.query.url ?? '').toString();
 
 	if (Array.isArray(url)) {
@@ -21,5 +21,5 @@ export const paramsParser = (
 	request.params.grayscale = (request.query.bw !== '0') as any;
 	request.params.quality = parseInt(request.query.l?.toString()!) as any;
 
-	next();
-};
+	return next();
+}
