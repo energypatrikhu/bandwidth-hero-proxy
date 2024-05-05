@@ -1,10 +1,18 @@
+import { availableParallelism } from 'node:os';
 import sharp from 'sharp';
 
-export const compress = async (originalImageBuffer: Buffer, params: any) => {
+export default async function compress(
+	originalImageBuffer: Buffer,
+	params: any,
+) {
 	try {
 		const { format, grayscale, quality } = params;
 
-		const outputInfo = await sharp(originalImageBuffer, {
+		sharp.cache(false);
+		sharp.simd(true);
+		sharp.concurrency(availableParallelism());
+
+		return await sharp(originalImageBuffer, {
 			animated: format === 'webp',
 			limitInputPixels: false,
 			failOn: 'none',
@@ -18,11 +26,10 @@ export const compress = async (originalImageBuffer: Buffer, params: any) => {
 				progressive: true,
 				optimiseScans: true,
 				optimiseCoding: true,
+				force: true,
 			})
-			.toBuffer();
-
-		return { buffer: outputInfo, size: outputInfo.length!, quality };
+			.toBuffer({ resolveWithObject: true });
 	} catch (error) {
 		throw error ?? new Error('This should not happen');
 	}
-};
+}
