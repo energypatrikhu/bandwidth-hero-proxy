@@ -2,10 +2,9 @@ import express from 'express';
 import cluster from 'node:cluster';
 import { availableParallelism } from 'node:os';
 import process from 'node:process';
-import sharp from 'sharp';
 
-import { paramsParser } from './paramsParser.js';
-import { proxy } from './proxy.js';
+import paramsParser from './paramsParser.js';
+import proxy from './proxy.js';
 import { logger } from '@energypatrikhu/node-core-utils';
 
 const numOfCpus = availableParallelism();
@@ -22,10 +21,6 @@ if (cluster.isPrimary) {
 		cluster.fork();
 	});
 } else {
-	sharp.cache(false);
-	sharp.simd(true);
-	sharp.concurrency(numOfCpus);
-
 	const server = express();
 	const port = process.env.PORT || 80;
 
