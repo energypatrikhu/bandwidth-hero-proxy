@@ -1,19 +1,19 @@
 import { Request, Response } from 'express';
 import _ from 'lodash';
 import superagent from 'superagent';
-import { getHeapSpaceStatistics, getHeapStatistics, type HeapInfo } from 'v8';
 
-import { compress } from './compress.js';
-import { copyHeaders } from './copyHeaders.js';
-import { redirect } from './redirect.js';
+import compress from './compress.js';
 import { convertFileSize, logger } from '@energypatrikhu/node-core-utils';
 
-export const proxy = async (request: Request, response: Response) => {
+export default async function proxy(
+	appRequest: Request,
+	appResponse: Response,
+) {
 	const headers = {
-		..._.pick(request.headers, ['cookie', 'dnt', 'referer']),
+		..._.pick(appRequest.headers, ['cookie', 'dnt', 'referer']),
 		'accept-encoding': '*',
 		'user-agent': 'Bandwidth-Hero Compressor',
-		'x-forwarded-for': request.headers['x-forwarded-for']?.toString()!,
+		'x-forwarded-for': appRequest.headers['x-forwarded-for']?.toString()!,
 		'via': '1.1 bandwidth-hero',
 		'cache-control':
 			'private, no-cache, no-store, must-revalidate, max-age=0, proxy-revalidate, s-maxage=0',
@@ -23,9 +23,18 @@ export const proxy = async (request: Request, response: Response) => {
 		'vary': '*',
 	} satisfies Record<string, string>;
 
+	const { url, quality } = appRequest.params;
+
+	if (url === undefined) {
+		throw new Error('URL is not defined');
+	}
+	if (quality === undefined) {
+		throw new Error('Quality is not defined');
+	}
+
 	try {
 		const netResponse = await superagent
-			.get(request.params.url)
+			.get(url)
 			.set(headers)
 			.withCredentials()
 			.responseType('arraybuffer')
@@ -34,74 +43,55 @@ export const proxy = async (request: Request, response: Response) => {
 		const mediaSize = netResponse.body.length;
 		const compressedImage = await compress(
 			netResponse.body,
-			request.params,
+			appRequest.params,
 		);
-		const savedSize = mediaSize - compressedImage.size;
+		const savedSize = mediaSize - compressedImage.info.size;
 
-		copyHeaders({ source: netResponse, response });
-		response.setHeader('content-encoding', 'identity');
-		response.setHeader('content-type', `image/${request.params.format}`);
-		response.setHeader('content-length', compressedImage.size);
-		response.setHeader('x-original-size', mediaSize);
-		response.setHeader('x-bytes-saved', savedSize);
-		response.setHeader('connection', 'close');
-		response.status(200).send(compressedImage.buffer);
+		appResponse.writeHead(200, {
+			...netResponse.headers,
+			'content-encoding': 'identity',
+			'content-type': `image/${appRequest.params.format}`,
+			'content-length': compressedImage.info.size,
+			'x-original-size': mediaSize,
+			'x-bytes-saved': savedSize,
+			'connection': 'close',
+		});
 
-		response.end(() => {
-			const memoryData = process.memoryUsage();
-			const heapStatistics = getHeapStatistics();
-			const heapSpaceStatistics = getHeapSpaceStatistics();
-
-			const heapStats: { [key: string]: string } = {};
-			for (const key in memoryData) {
-				heapStats[key] = convertFileSize(
-					memoryData[<keyof NodeJS.MemoryUsage>key],
-				);
-			}
-			for (const key in heapStatistics) {
-				heapStats[key] = convertFileSize(
-					heapStatistics[<keyof HeapInfo>key],
-				);
-			}
-			for (const { space_name, space_used_size } of heapSpaceStatistics) {
-				heapStats[space_name] = convertFileSize(space_used_size);
-			}
-
+		appResponse.end(compressedImage.data, () => {
 			logger(
 				'info',
 				JSON.stringify(
 					{
 						worker: process.pid,
 						params: {
-							...request.params,
-							imgQuality: compressedImage.quality,
+							...appRequest.params,
+							imgQuality: quality,
 						},
 						headers,
 						body: {
 							originalSize: convertFileSize(mediaSize),
 							compressedSize: convertFileSize(
-								compressedImage.size,
+								compressedImage.info.size,
 							),
 							savedSize: convertFileSize(savedSize),
 						},
-						// heapStats,
 					},
 					null,
 					1,
 				).replace(/\"/g, ''),
 			);
 
-			response.flushHeaders();
-			response.destroy();
-			request.drop(Infinity);
-			request.destroy();
+			appResponse.flushHeaders();
+			appResponse.destroy();
+			appRequest.drop(Infinity);
+			appRequest.destroy();
 
-			netResponse?.body.set([]);
-			netResponse?.body.fill(0);
-			netResponse!.body = Buffer.alloc(0);
-			compressedImage.buffer.set([]);
-			compressedImage.buffer.fill(0);
-			compressedImage.buffer = Buffer.alloc(0);
+			netResponse.body.set([]);
+			netResponse.body.fill(0);
+			netResponse.body = Buffer.alloc(0);
+			compressedImage.data.set([]);
+			compressedImage.data.fill(0);
+			compressedImage.data = Buffer.alloc(0);
 
 			if (gc) gc();
 			else if (global.gc) global.gc();
@@ -112,7 +102,7 @@ export const proxy = async (request: Request, response: Response) => {
 			JSON.stringify(
 				{
 					worker: process.pid,
-					params: request.params,
+					params: appRequest.params,
 					headers,
 					body: {
 						error: 'Cannot compress! ' + (reason.message ?? reason),
@@ -123,9 +113,24 @@ export const proxy = async (request: Request, response: Response) => {
 			).replace(/\"/g, ''),
 		);
 
+		if (appResponse.headersSent) {
+			if (gc) gc();
+			else if (global.gc) global.gc();
+			return;
+		}
+
+		appResponse.writeHead(302, {
+			'Content-Length': '0',
+			'Location': encodeURI(url),
+		});
+		appResponse.end(() => {
+			appResponse.flushHeaders();
+			appResponse.destroy();
+			appRequest.drop(Infinity);
+			appRequest.destroy();
+		});
+
 		if (gc) gc();
 		else if (global.gc) global.gc();
-
-		return redirect({ request, response, params: request.params });
 	}
-};
+}
