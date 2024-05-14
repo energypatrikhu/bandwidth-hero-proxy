@@ -5,7 +5,7 @@ import process from 'node:process';
 
 import paramsParser from './paramsParser.js';
 import proxy from './proxy.js';
-import { logger } from '@energypatrikhu/node-core-utils';
+import { logger } from '@energypatrikhu/node-utils';
 
 const numOfCpus = availableParallelism();
 

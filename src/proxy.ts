@@ -3,20 +3,16 @@ import _ from 'lodash';
 import superagent from 'superagent';
 
 import compress from './compress.js';
-import { convertFileSize, logger } from '@energypatrikhu/node-core-utils';
+import { convertFileSize, logger } from '@energypatrikhu/node-utils';
 
-export default async function proxy(
-	appRequest: Request,
-	appResponse: Response,
-) {
+export default async function proxy(appRequest: Request, appResponse: Response) {
 	const headers = {
 		..._.pick(appRequest.headers, ['cookie', 'dnt', 'referer']),
 		'accept-encoding': '*',
 		'user-agent': 'Bandwidth-Hero Compressor',
 		'x-forwarded-for': appRequest.headers['x-forwarded-for']?.toString()!,
 		'via': '1.1 bandwidth-hero',
-		'cache-control':
-			'private, no-cache, no-store, must-revalidate, max-age=0, proxy-revalidate, s-maxage=0',
+		'cache-control': 'private, no-cache, no-store, must-revalidate, max-age=0, proxy-revalidate, s-maxage=0',
 		'pragma': 'no-cache',
 		'expires': '0',
 		'connection': 'close',
@@ -33,18 +29,10 @@ export default async function proxy(
 	}
 
 	try {
-		const netResponse = await superagent
-			.get(url)
-			.set(headers)
-			.withCredentials()
-			.responseType('arraybuffer')
-			.buffer(true);
+		const netResponse = await superagent.get(url).set(headers).withCredentials().responseType('arraybuffer').buffer(true);
 
 		const mediaSize = netResponse.body.length;
-		const compressedImage = await compress(
-			netResponse.body,
-			appRequest.params,
-		);
+		const compressedImage = await compress(netResponse.body, appRequest.params);
 		const savedSize = mediaSize - compressedImage.info.size;
 
 		appResponse.writeHead(200, {
@@ -70,9 +58,7 @@ export default async function proxy(
 						headers,
 						body: {
 							originalSize: convertFileSize(mediaSize),
-							compressedSize: convertFileSize(
-								compressedImage.info.size,
-							),
+							compressedSize: convertFileSize(compressedImage.info.size),
 							savedSize: convertFileSize(savedSize),
 						},
 					},

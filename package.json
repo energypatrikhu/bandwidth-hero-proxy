@@ -11,7 +11,7 @@
 		"docker:push": "docker push energyhun24/bandwidth-hero-proxy:latest"
 	},
 	"dependencies": {
-		"@energypatrikhu/node-core-utils": "^0.0.7",
+		"@energypatrikhu/node-utils": "^0.1.9",
 		"express": "^4.19.2",
 		"lodash": "^4.17.21",
 		"sharp": "^0.33.3",
