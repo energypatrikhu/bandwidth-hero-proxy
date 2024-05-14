@@ -1,0 +1,11 @@
+{
+	"inputFile": "src/index.ts",
+	"outFile": "build/index.js",
+	"options": {
+		"platform": "node",
+		"logLevel": "warning",
+		"treeShaking": true,
+		"minify": true,
+		"format": "cjs"
+	}
+}

@@ -5,14 +5,13 @@
 	"license": "MIT",
 	"type": "module",
 	"scripts": {
-		"build": "node ./esbuild.config.mjs",
+		"build": "esbuild-wrapper",
 		"docker": "npm run build && npm run docker:build && npm run docker:push",
 		"docker:build": "docker build -t energyhun24/bandwidth-hero-proxy .",
 		"docker:push": "docker push energyhun24/bandwidth-hero-proxy:latest"
 	},
 	"dependencies": {
 		"@energypatrikhu/node-core-utils": "^0.0.7",
-		"esbuild": "^0.20.2",
 		"express": "^4.19.2",
 		"lodash": "^4.17.21",
 		"sharp": "^0.33.3",
@@ -21,6 +20,7 @@
 		"user-agents": "^1.1.195"
 	},
 	"devDependencies": {
+		"@energypatrikhu/esbuild-wrapper": "^0.0.4",
 		"@types/express": "^4.17.21",
 		"@types/lodash": "^4.17.1",
 		"@types/node": "^20.12.8",
