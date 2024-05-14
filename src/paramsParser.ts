@@ -1,10 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 
-export default function paramsParser(
-	request: Request,
-	response: Response,
-	next: NextFunction,
-) {
+export default function paramsParser(request: Request, response: Response, next: NextFunction) {
 	let url = (request.query.url ?? '').toString();
 
 	if (Array.isArray(url)) {

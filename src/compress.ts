@@ -1,10 +1,7 @@
 import { availableParallelism } from 'node:os';
 import sharp from 'sharp';
 
-export default async function compress(
-	originalImageBuffer: Buffer,
-	params: any,
-) {
+export default async function compress(originalImageBuffer: Buffer, params: any) {
 	try {
 		const { format, grayscale, quality } = params;
 
