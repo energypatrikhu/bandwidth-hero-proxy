@@ -3,7 +3,6 @@
 	"main": "build/index.js",
 	"private": true,
 	"license": "MIT",
-	"type": "module",
 	"scripts": {
 		"build": "esbuild-wrapper",
 		"docker": "npm run build && npm run docker:build && npm run docker:push",
