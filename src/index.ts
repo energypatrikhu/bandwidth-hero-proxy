@@ -1,7 +1,7 @@
 import express, { type NextFunction, type Request, type Response } from 'express';
-import cluster from 'node:cluster';
-import { availableParallelism } from 'node:os';
-import process from 'node:process';
+import cluster from 'cluster';
+import { availableParallelism } from 'os';
+import process from 'process';
 
 import paramsParser from './paramsParser.js';
 import proxy from './proxy.js';
