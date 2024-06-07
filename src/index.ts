@@ -2,10 +2,9 @@ import express, { type NextFunction, type Request, type Response } from 'express
 import cluster from 'cluster';
 import { availableParallelism } from 'os';
 import process from 'process';
-
+import { logger } from '@energypatrikhu/node-utils';
 import paramsParser from './paramsParser.js';
 import proxy from './proxy.js';
-import { logger } from '@energypatrikhu/node-utils';
 
 const numOfCpus = availableParallelism();
 
