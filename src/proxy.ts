@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import _ from 'lodash';
 import superagent from 'superagent';
-
 import compress from './compress.js';
 import { convertFileSize, logger } from '@energypatrikhu/node-utils';
 
@@ -19,26 +18,29 @@ export default async function proxy(appRequest: Request, appResponse: Response) 
 		'vary': '*',
 	} satisfies Record<string, string>;
 
-	const { url, quality } = appRequest.params;
-
-	if (url === undefined) {
-		throw new Error('URL is not defined');
-	}
-	if (quality === undefined) {
-		throw new Error('Quality is not defined');
-	}
-
 	try {
-		const netResponse = await superagent.get(url).set(headers).withCredentials().responseType('arraybuffer').buffer(true);
+		if (appRequest.app.locals.url === undefined) {
+			throw new Error('URL is not defined');
+		}
+		if (appRequest.app.locals.quality === undefined) {
+			throw new Error('Quality is not defined');
+		}
+
+		const netResponse = await superagent
+			.get(appRequest.app.locals.url)
+			.set(headers)
+			.withCredentials()
+			.responseType('arraybuffer')
+			.buffer(true);
 
 		const mediaSize = netResponse.body.length;
-		const compressedImage = await compress(netResponse.body, appRequest.params);
+		const compressedImage = await compress(netResponse.body, appRequest.app.locals);
 		const savedSize = mediaSize - compressedImage.info.size;
 
 		appResponse.writeHead(200, {
 			...netResponse.headers,
 			'content-encoding': 'identity',
-			'content-type': `image/${appRequest.params.format}`,
+			'content-type': `image/${appRequest.app.locals.format}`,
 			'content-length': compressedImage.info.size,
 			'x-original-size': mediaSize,
 			'x-bytes-saved': savedSize,
@@ -51,10 +53,7 @@ export default async function proxy(appRequest: Request, appResponse: Response) 
 				JSON.stringify(
 					{
 						worker: process.pid,
-						params: {
-							...appRequest.params,
-							imgQuality: quality,
-						},
+						params: appRequest.app.locals,
 						headers,
 						body: {
 							originalSize: convertFileSize(mediaSize),
@@ -88,7 +87,7 @@ export default async function proxy(appRequest: Request, appResponse: Response) 
 			JSON.stringify(
 				{
 					worker: process.pid,
-					params: appRequest.params,
+					params: appRequest.app.locals,
 					headers,
 					body: {
 						error: 'Cannot compress! ' + (reason.message ?? reason),
@@ -105,16 +104,20 @@ export default async function proxy(appRequest: Request, appResponse: Response) 
 			return;
 		}
 
-		appResponse.writeHead(302, {
-			'Content-Length': '0',
-			'Location': encodeURI(url),
-		});
-		appResponse.end(() => {
-			appResponse.flushHeaders();
-			appResponse.destroy();
-			appRequest.drop(Infinity);
-			appRequest.destroy();
-		});
+		appResponse
+			.writeHead(302, {
+				'Content-Length': '0',
+				'Location': encodeURI(appRequest.app.locals.url),
+			})
+			.end(() => {
+				appResponse.flushHeaders();
+				appResponse.destroy();
+				appRequest.drop(Infinity);
+				appRequest.destroy();
+
+				if (gc) gc();
+				else if (global.gc) global.gc();
+			});
 
 		if (gc) gc();
 		else if (global.gc) global.gc();
