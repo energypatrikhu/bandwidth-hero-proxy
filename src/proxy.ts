@@ -53,16 +53,17 @@ export default async function proxy(appRequest: Request, appResponse: Response) 
     appResponse.end(compressedImage.data, () => {
       logger(
         'info',
-        beautifyObject({
-          worker: process.pid,
-          params: appRequest.app.locals,
-          headers,
-          body: {
-            originalSize: convertFileSize(mediaSize),
-            compressedSize: convertFileSize(compressedImage.info.size),
-            savedSize: convertFileSize(savedSize),
-          },
-        }),
+        '\n' +
+          beautifyObject({
+            worker: process.pid,
+            params: appRequest.app.locals,
+            headers,
+            body: {
+              originalSize: convertFileSize(mediaSize),
+              compressedSize: convertFileSize(compressedImage.info.size),
+              savedSize: convertFileSize(savedSize),
+            },
+          }),
       );
 
       appResponse.flushHeaders();
@@ -83,15 +84,16 @@ export default async function proxy(appRequest: Request, appResponse: Response) 
   } catch (reason: any) {
     logger(
       'error',
-      beautifyObject({
-        worker: process.pid,
-        params: appRequest.app.locals,
-        headers,
-        body: {
-          error: 'Cannot compress!',
-          reason: reason.message ?? reason,
-        },
-      }),
+      '\n' +
+        beautifyObject({
+          worker: process.pid,
+          params: appRequest.app.locals,
+          headers,
+          body: {
+            error: 'Cannot compress!',
+            reason: reason.message ?? reason,
+          },
+        }),
     );
 
     if (appResponse.headersSent) {
