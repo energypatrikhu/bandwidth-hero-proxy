@@ -7,16 +7,8 @@ import { beautifyObject } from './beautify-object.js';
 
 export default async function proxy(appRequest: Request, appResponse: Response) {
   const headers = {
-    ..._.pick(appRequest.headers, ['cookie', 'dnt', 'referer']),
-    'accept-encoding': '*',
-    'user-agent': 'Bandwidth-Hero Compressor',
-    'x-forwarded-for': appRequest.headers['x-forwarded-for']?.toString()!,
-    'via': '1.1 bandwidth-hero',
-    'cache-control': 'private, no-cache, no-store, must-revalidate, max-age=0, proxy-revalidate, s-maxage=0',
-    'pragma': 'no-cache',
-    'expires': '0',
-    'connection': 'close',
-    'vary': '*',
+    ..._.omit(appRequest.headers, ['host']),
+    via: '1.1 bandwidth-hero',
   } satisfies Record<string, string>;
 
   try {
