@@ -1,29 +1,29 @@
 {
-	"name": "bandwidth-hero-proxy",
-	"main": "build/index.js",
-	"private": true,
-	"license": "MIT",
-	"scripts": {
-		"build": "esbuild-wrapper",
-		"docker": "npm run build && npm run docker:build && npm run docker:push",
-		"docker:build": "docker build -t energyhun24/bandwidth-hero-proxy .",
-		"docker:push": "docker push energyhun24/bandwidth-hero-proxy:latest"
-	},
-	"dependencies": {
-		"@energypatrikhu/node-utils": "^0.1.11",
-		"express": "^4.19.2",
-		"lodash": "^4.17.21",
-		"sharp": "^0.33.4",
-		"superagent": "^9.0.2",
-		"user-agents": "^1.1.228"
-	},
-	"devDependencies": {
-		"@energypatrikhu/esbuild-wrapper": "^0.0.4",
-		"@types/express": "^4.17.21",
-		"@types/lodash": "^4.17.4",
-		"@types/node": "^20.14.2",
-		"@types/superagent": "^8.1.7",
-		"@types/user-agents": "^1.0.4",
-		"typescript": "^5.4.5"
-	}
+  "name": "bandwidth-hero-proxy",
+  "main": "build/index.js",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build": "esbuild-wrapper",
+    "docker": "npm run build && npm run docker:build && npm run docker:push",
+    "docker:build": "docker build -t energyhun24/bandwidth-hero-proxy .",
+    "docker:push": "docker push energyhun24/bandwidth-hero-proxy:latest"
+  },
+  "dependencies": {
+    "@energypatrikhu/node-utils": "0.2.1",
+    "express": "5.0.0",
+    "lodash": "4.17.21",
+    "sharp": "0.33.5",
+    "superagent": "10.1.0",
+    "user-agents": "1.1.325"
+  },
+  "devDependencies": {
+    "@energypatrikhu/esbuild-wrapper": "0.0.10",
+    "@types/express": "4.17.21",
+    "@types/lodash": "4.17.7",
+    "@types/node": "22.5.5",
+    "@types/superagent": "8.1.9",
+    "@types/user-agents": "1.0.4",
+    "typescript": "5.6.2"
+  }
 }
