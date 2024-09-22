@@ -1,8 +1,6 @@
 function beautifyData(data: any, level: number = 0) {
   const output: string[] = [];
 
-  console.log(data);
-
   for (const [key, value] of Object.entries(data)) {
     if (typeof value === 'object') {
       output.push(`${'  '.repeat(level)}> ${key}:`);
