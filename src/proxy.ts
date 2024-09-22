@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
-import _ from 'lodash';
 import superagent from 'superagent';
 import compress from './compress.js';
 import { convertFileSize, logger } from '@energypatrikhu/node-utils';
 import { beautifyObject } from './beautify-object.js';
+import { omitStartWith } from './omit.js';
 
 export default async function proxy(appRequest: Request, appResponse: Response) {
   const headers = {
-    ..._.omit(appRequest.headers, ['host']),
+    ...omitStartWith(appRequest.headers, ['host', 'cf-']),
     via: '1.1 bandwidth-hero',
   } satisfies Record<string, string>;
 
