@@ -10,11 +10,13 @@ export default async function proxy(appRequest: Request, appResponse: Response) 
 
 	if (appRequest.app.locals.url === undefined) {
 		logger('error', 'URL is not defined');
+		appResponse.status(400).send('URL is not defined');
 		return;
 	}
 
 	if (appRequest.app.locals.quality === undefined) {
 		logger('error', 'Quality is not defined');
+		appResponse.status(400).send('Quality is not defined');
 		return;
 	}
 
