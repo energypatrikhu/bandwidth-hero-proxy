@@ -43,10 +43,11 @@ export default async function proxy(appRequest: Request, appResponse: Response) 
 			'content-length': compressedSize,
 			'x-original-size': mediaSize,
 			'x-bytes-saved': savedSize,
-			'connection': 'close',
 		});
 
-		appResponse.end(compressedImage.data, () => {
+		appResponse.write(compressedImage.data);
+
+		appResponse.end(() => {
 			logger(
 				'info',
 				'\n' +
