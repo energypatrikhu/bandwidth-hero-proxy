@@ -1,7 +1,7 @@
 import { availableParallelism } from 'os';
 import sharp from 'sharp';
 
-export default async function compress(imageBuffer: Buffer, locals: Express.Locals) {
+export default function compress(imageBuffer: Buffer, locals: Express.Locals) {
 	try {
 		sharp.cache(false);
 		sharp.simd(true);
@@ -34,7 +34,7 @@ export default async function compress(imageBuffer: Buffer, locals: Express.Loca
 				break;
 		}
 
-		return await sharpInstance.toBuffer({ resolveWithObject: true });
+		return sharpInstance.toBuffer({ resolveWithObject: true });
 	} catch (error) {
 		throw error ?? new Error('This should not happen');
 	}
