@@ -29,9 +29,9 @@ export function parseRequestParameters(request: Request, response: Response, nex
 
 	request.app.locals = {
 		url: finalUrl.replace(/http:\/\/1\.1\.\d\.\d\/bmi\/(https?:\/\/)?/i, 'http://'),
-		format: filteredQueryParams.jpg !== '1' ? 'webp' : 'jpeg',
-		grayscale: filteredQueryParams.bw !== '0',
-		quality: parseInt(filteredQueryParams.l || '0'),
+		format: filteredQueryParams.jpg === '1' ? 'jpeg' : 'webp',
+		grayscale: filteredQueryParams.bw === '1',
+		quality: parseInt(filteredQueryParams.l || '80'),
 	};
 
 	next();

@@ -7,14 +7,7 @@ import { omitEquals } from './omit-equals.js';
 
 export async function handleImageProxyRequest(appRequest: Request, appResponse: Response) {
 	const filteredRequestHeaders = omitEquals(appRequest.headers, ['host']);
-	const { url, quality, format } = appRequest.app.locals;
-
-	if (!url || !quality) {
-		const missingParameter = !url ? 'URL' : 'Quality';
-		logger('error', `${missingParameter} is not defined`);
-		appResponse.status(400).send(`${missingParameter} is not defined`);
-		return;
-	}
+	const { url, format } = appRequest.app.locals;
 
 	try {
 		const externalImageResponse = await superagent
