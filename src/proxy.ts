@@ -41,18 +41,23 @@ export default async function proxy(appRequest: Request, appResponse: Response) 
 		const compressedSizePercentage = (compressedSize / mediaSize) * 100;
 		const savedSizePercentage = 100 - compressedSizePercentage;
 
-		const responseHeaders = {
-			...netResponse.headers,
-			'content-encoding': 'identity',
-			'content-type': `image/${appRequest.app.locals.format}`,
-			'content-length': compressedSize,
-			'x-original-size': mediaSize,
-			'x-bytes-saved': savedSize,
-		};
+		let responseHeaders = netResponse.headers;
+		let usingOrigin = true;
+
+		if (savedSize > 0) {
+			usingOrigin = false;
+			responseHeaders = {
+				...responseHeaders,
+				'content-encoding': 'identity',
+				'content-type': `image/${appRequest.app.locals.format}`,
+				'content-length': compressedSize.toString(),
+				'x-original-size': mediaSize,
+				'x-bytes-saved': savedSize.toString(),
+			};
+		}
 
 		appResponse.writeHead(200, responseHeaders);
-
-		appResponse.write(compressedImage.data);
+		appResponse.write(usingOrigin ? netResponse.body : compressedImage.data);
 
 		appResponse.end(() => {
 			logger(
@@ -67,6 +72,7 @@ export default async function proxy(appRequest: Request, appResponse: Response) 
 							originalSize: convertFileSize(mediaSize, 2),
 							compressedSize: convertFileSize(compressedSize, 2) + ` (${compressedSizePercentage.toFixed(2)}%)`,
 							savedSize: convertFileSize(savedSize, 2) + ` (${savedSizePercentage.toFixed(2)}%)`,
+							usingOrigin,
 						},
 					}),
 			);
