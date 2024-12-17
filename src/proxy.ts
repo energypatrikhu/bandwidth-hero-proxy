@@ -55,9 +55,9 @@ export default async function proxy(appRequest: Request, appResponse: Response) 
 						params: appRequest.app.locals,
 						headers,
 						body: {
-							originalSize: convertFileSize(mediaSize),
-							compressedSize: convertFileSize(compressedSize) + ` (${compressedSizePercentage.toFixed(2)}%)`,
-							savedSize: convertFileSize(savedSize) + ` (${savedSizePercentage.toFixed(2)}%)`,
+							originalSize: convertFileSize(mediaSize, 2),
+							compressedSize: convertFileSize(compressedSize, 2) + ` (${compressedSizePercentage.toFixed(2)}%)`,
+							savedSize: convertFileSize(savedSize, 2) + ` (${savedSizePercentage.toFixed(2)}%)`,
 						},
 					}),
 			);
