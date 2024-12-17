@@ -8,6 +8,8 @@ import { omitEquals } from './omit-equals.js';
 export async function handleImageProxyRequest(appRequest: Request, appResponse: Response) {
 	const filteredRequestHeaders = {
 		...omitEquals(appRequest.headers, ['host']),
+    'accept-encoding': '*',
+    'accept': '*/*',
 		'cache-control': 'no-cache',
 		'pragma': 'no-cache',
 		'connection': 'close',
