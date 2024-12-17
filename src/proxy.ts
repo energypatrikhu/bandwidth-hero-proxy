@@ -41,14 +41,16 @@ export default async function proxy(appRequest: Request, appResponse: Response) 
 		const compressedSizePercentage = (compressedSize / mediaSize) * 100;
 		const savedSizePercentage = 100 - compressedSizePercentage;
 
-		appResponse.writeHead(200, {
+		const responseHeaders = {
 			...netResponse.headers,
 			'content-encoding': 'identity',
 			'content-type': `image/${appRequest.app.locals.format}`,
 			'content-length': compressedSize,
 			'x-original-size': mediaSize,
 			'x-bytes-saved': savedSize,
-		});
+		};
+
+		appResponse.writeHead(200, responseHeaders);
 
 		appResponse.write(compressedImage.data);
 
@@ -59,7 +61,8 @@ export default async function proxy(appRequest: Request, appResponse: Response) 
 					beautifyObject({
 						worker: process.pid,
 						params: appRequest.app.locals,
-						headers,
+						request_headers: headers,
+						response_headers: responseHeaders,
 						body: {
 							originalSize: convertFileSize(mediaSize, 2),
 							compressedSize: convertFileSize(compressedSize, 2) + ` (${compressedSizePercentage.toFixed(2)}%)`,
