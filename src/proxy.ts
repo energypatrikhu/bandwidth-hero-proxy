@@ -7,9 +7,9 @@ import { omitStartWith } from './omit.js';
 
 export default async function proxy(appRequest: Request, appResponse: Response) {
 	const headers = {
-		...omitStartWith(appRequest.headers, ['host', 'cf-']),
+		...omitStartWith(appRequest.headers, ['host']),
 		via: '1.1 bandwidth-hero',
-	} satisfies Record<string, string>;
+	};
 
 	try {
 		if (appRequest.app.locals.url === undefined) {
@@ -24,6 +24,11 @@ export default async function proxy(appRequest: Request, appResponse: Response) 
 		const netResponse = await superagent
 			.get(appRequest.app.locals.url)
 			.set(headers)
+			.timeout({
+				response: 30000,
+				deadline: 60000,
+			})
+			.retry(3)
 			.withCredentials()
 			.responseType('arraybuffer')
 			.buffer(true);
