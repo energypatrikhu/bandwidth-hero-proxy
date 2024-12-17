@@ -7,8 +7,8 @@ import { parseRequestParameters } from './parse-request-parameters.js';
 import { handleImageProxyRequest } from './handle-image-proxy-request.js';
 
 const maxClusterSize = process.env.MAX_CLUSTER_SIZE || 4;
-const cpuCount = availableParallelism();
-const clusterSize = Math.min(cpuCount, parseInt(maxClusterSize.toString(), 10));
+const cpuCount = Math.min(availableParallelism(), parseInt(maxClusterSize.toString(), 10));
+const clusterSize = parseInt(process.env.CLUSTER_SIZE || '0', 10) || cpuCount;
 
 if (cluster.isPrimary) {
 	logger('info', `Primary process ${process.pid} is running`);
