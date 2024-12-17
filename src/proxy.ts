@@ -6,110 +6,114 @@ import { beautifyObject } from './beautify-object.js';
 import { omitStartWith } from './omit.js';
 
 export default async function proxy(appRequest: Request, appResponse: Response) {
-  const headers = {
-    ...omitStartWith(appRequest.headers, ['host', 'cf-']),
-    via: '1.1 bandwidth-hero',
-  } satisfies Record<string, string>;
+	const headers = {
+		...omitStartWith(appRequest.headers, ['host', 'cf-']),
+		via: '1.1 bandwidth-hero',
+	} satisfies Record<string, string>;
 
-  try {
-    if (appRequest.app.locals.url === undefined) {
-      logger('error', 'URL is not defined');
-      return;
-    }
-    if (appRequest.app.locals.quality === undefined) {
-      logger('error', 'Quality is not defined');
-      return;
-    }
+	try {
+		if (appRequest.app.locals.url === undefined) {
+			logger('error', 'URL is not defined');
+			return;
+		}
+		if (appRequest.app.locals.quality === undefined) {
+			logger('error', 'Quality is not defined');
+			return;
+		}
 
-    const netResponse = await superagent
-      .get(appRequest.app.locals.url)
-      .set(headers)
-      .withCredentials()
-      .responseType('arraybuffer')
-      .buffer(true);
+		const netResponse = await superagent
+			.get(appRequest.app.locals.url)
+			.set(headers)
+			.withCredentials()
+			.responseType('arraybuffer')
+			.buffer(true);
 
-    const mediaSize = netResponse.body.length;
-    const compressedImage = await compress(netResponse.body, appRequest.app.locals);
-    const savedSize = mediaSize - compressedImage.info.size;
+		const mediaSize = netResponse.body.length;
+		const compressedImage = await compress(netResponse.body, appRequest.app.locals);
+		const compressedSize = compressedImage.info.size;
+		const savedSize = mediaSize - compressedSize;
 
-    appResponse.writeHead(200, {
-      ...netResponse.headers,
-      'content-encoding': 'identity',
-      'content-type': `image/${appRequest.app.locals.format}`,
-      'content-length': compressedImage.info.size,
-      'x-original-size': mediaSize,
-      'x-bytes-saved': savedSize,
-      'connection': 'close',
-    });
+		const compressedSizePercentage = (compressedSize / mediaSize) * 100;
+		const savedSizePercentage = 100 - compressedSizePercentage;
 
-    appResponse.end(compressedImage.data, () => {
-      logger(
-        'info',
-        '\n' +
-          beautifyObject({
-            worker: process.pid,
-            params: appRequest.app.locals,
-            headers,
-            body: {
-              originalSize: convertFileSize(mediaSize),
-              compressedSize: convertFileSize(compressedImage.info.size),
-              savedSize: convertFileSize(savedSize),
-            },
-          }),
-      );
+		appResponse.writeHead(200, {
+			...netResponse.headers,
+			'content-encoding': 'identity',
+			'content-type': `image/${appRequest.app.locals.format}`,
+			'content-length': compressedSize,
+			'x-original-size': mediaSize,
+			'x-bytes-saved': savedSize,
+			'connection': 'close',
+		});
 
-      appResponse.flushHeaders();
-      appResponse.destroy();
-      appRequest.drop(Infinity);
-      appRequest.destroy();
+		appResponse.end(compressedImage.data, () => {
+			logger(
+				'info',
+				'\n' +
+					beautifyObject({
+						worker: process.pid,
+						params: appRequest.app.locals,
+						headers,
+						body: {
+							originalSize: convertFileSize(mediaSize),
+							compressedSize: convertFileSize(compressedSize) + ` (${compressedSizePercentage.toFixed(2)}%)`,
+							savedSize: convertFileSize(savedSize) + ` (${savedSizePercentage.toFixed(2)}%)`,
+						},
+					}),
+			);
 
-      netResponse.body.set([]);
-      netResponse.body.fill(0);
-      netResponse.body = Buffer.alloc(0);
-      compressedImage.data.set([]);
-      compressedImage.data.fill(0);
-      compressedImage.data = Buffer.alloc(0);
+			appResponse.flushHeaders();
+			appResponse.destroy();
+			appRequest.drop(Infinity);
+			appRequest.destroy();
 
-      if (gc) gc();
-      else if (global.gc) global.gc();
-    });
-  } catch (reason: any) {
-    logger(
-      'error',
-      '\n' +
-        beautifyObject({
-          worker: process.pid,
-          params: appRequest.app.locals,
-          headers,
-          body: {
-            error: 'Cannot compress!',
-            reason: reason.message ?? reason,
-          },
-        }),
-    );
+			netResponse.body.set([]);
+			netResponse.body.fill(0);
+			netResponse.body = Buffer.alloc(0);
+			compressedImage.data.set([]);
+			compressedImage.data.fill(0);
+			compressedImage.data = Buffer.alloc(0);
 
-    if (appResponse.headersSent) {
-      if (gc) gc();
-      else if (global.gc) global.gc();
-      return;
-    }
+			if (gc) gc();
+			else if (global.gc) global.gc();
+		});
+	} catch (reason: any) {
+		logger(
+			'error',
+			'\n' +
+				beautifyObject({
+					worker: process.pid,
+					params: appRequest.app.locals,
+					headers,
+					body: {
+						error: 'Cannot compress!',
+						reason: reason.message ?? reason,
+					},
+				}),
+		);
 
-    appResponse
-      .writeHead(302, {
-        'Content-Length': '0',
-        'Location': encodeURI(appRequest.app.locals.url),
-      })
-      .end(() => {
-        appResponse.flushHeaders();
-        appResponse.destroy();
-        appRequest.drop(Infinity);
-        appRequest.destroy();
+		if (appResponse.headersSent) {
+			if (gc) gc();
+			else if (global.gc) global.gc();
+			return;
+		}
 
-        if (gc) gc();
-        else if (global.gc) global.gc();
-      });
+		appResponse
+			.writeHead(302, {
+				'Content-Length': '0',
+				'Location': encodeURI(appRequest.app.locals.url),
+			})
+			.end(() => {
+				appResponse.flushHeaders();
+				appResponse.destroy();
+				appRequest.drop(Infinity);
+				appRequest.destroy();
 
-    if (gc) gc();
-    else if (global.gc) global.gc();
-  }
+				if (gc) gc();
+				else if (global.gc) global.gc();
+			});
+
+		if (gc) gc();
+		else if (global.gc) global.gc();
+	}
 }
