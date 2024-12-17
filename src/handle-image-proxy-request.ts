@@ -8,8 +8,8 @@ import { omitEquals } from './omit-equals.js';
 export async function handleImageProxyRequest(appRequest: Request, appResponse: Response) {
 	const filteredRequestHeaders = {
 		...omitEquals(appRequest.headers, ['host']),
-    'accept-encoding': '*',
-    'accept': '*/*',
+		'accept-encoding': '*',
+		'accept': '*/*',
 		'cache-control': 'no-cache',
 		'pragma': 'no-cache',
 		'connection': 'close',
@@ -37,6 +37,8 @@ export async function handleImageProxyRequest(appRequest: Request, appResponse: 
 		const compressedSizePercentage = (compressedImageSize / originalImageSize) * 100;
 		const savedSizePercentage = 100 - compressedSizePercentage;
 
+		appResponse.removeHeader('transfer-encoding');
+
 		if (savedImageSize > 0) {
 			appResponse.set({
 				'content-encoding': 'identity',
@@ -45,7 +47,6 @@ export async function handleImageProxyRequest(appRequest: Request, appResponse: 
 				'x-original-size': originalImageSize.toString(),
 				'x-bytes-saved': savedImageSize.toString(),
 			});
-			appResponse.removeHeader('transfer-encoding');
 			appResponse.send(compressedImageResult.data);
 		} else {
 			appResponse.send(externalImageResponse.body);
