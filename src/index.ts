@@ -6,12 +6,14 @@ import { logger } from '@energypatrikhu/node-utils';
 import { parseRequestParameters } from './parse-request-parameters.js';
 import { handleImageProxyRequest } from './handle-image-proxy-request.js';
 
+const maxClusterSize = process.env.MAX_CLUSTER_SIZE || 4;
 const cpuCount = availableParallelism();
+const clusterSize = Math.min(cpuCount, parseInt(maxClusterSize.toString(), 10));
 
 if (cluster.isPrimary) {
 	logger('info', `Primary process ${process.pid} is running`);
 
-	for (let i = 0; i < cpuCount; i++) {
+	for (let i = 0; i < clusterSize; i++) {
 		cluster.fork();
 	}
 
