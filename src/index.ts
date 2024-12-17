@@ -3,46 +3,46 @@ import cluster from 'cluster';
 import { availableParallelism } from 'os';
 import process from 'process';
 import { logger } from '@energypatrikhu/node-utils';
-import paramsParser from './params-parser.js';
-import proxy from './proxy.js';
+import { parseRequestParameters } from './parse-request-parameters.js';
+import { handleImageProxyRequest } from './handle-image-proxy-request.js';
 
-const numOfCpus = availableParallelism();
+const cpuCount = availableParallelism();
 
 if (cluster.isPrimary) {
-	logger('info', `Primary ${process.pid} is running`);
+	logger('info', `Primary process ${process.pid} is running`);
 
-	for (let i = 0; i < numOfCpus; i++) {
+	for (let i = 0; i < cpuCount; i++) {
 		cluster.fork();
 	}
 
 	cluster.on('exit', (worker) => {
-		logger('warn', `Worker ${worker.process.pid} died`);
+		logger('warn', `Worker process ${worker.process.pid} died`);
 		cluster.fork();
 	});
 } else {
-	const server = express();
-	const port = process.env.PORT || 80;
+	const app = express();
+	const serverPort = process.env.PORT || 80;
 
-	let lastRequestTime = Date.now();
-	function updateLastRequestTime(_req: Request, _res: Response, next: NextFunction) {
-		lastRequestTime = Date.now();
+	let lastRequestTimestamp = Date.now();
+
+	const updateLastRequestTimestamp = (_req: Request, _res: Response, next: NextFunction) => {
+		lastRequestTimestamp = Date.now();
 		next();
-	}
+	};
 
-	server.get('/', paramsParser, updateLastRequestTime, proxy);
-	server.get('/favicon.ico', (_req, res) => {
-		res.status(204).end();
-		return;
-	});
-	server.listen(port, () => {
-		logger('info', `Worker ${process.pid} listening on ${port}`);
+	app.get('/', parseRequestParameters, updateLastRequestTimestamp, handleImageProxyRequest);
+	app.get('/favicon.ico', (_req, res) => {
+		res.sendStatus(204);
 	});
 
-	setInterval(() => {
-		if (Date.now() - lastRequestTime < 10 * 1000) return;
-		if (Date.now() - lastRequestTime > 60 * 60 * 1000) return;
+	app.listen(serverPort, () => {
+		logger('info', `Worker process ${process.pid} listening on port ${serverPort}`);
 
-		if (gc) gc();
-		else if (global.gc) global.gc();
-	}, 5000);
+		setInterval(() => {
+			const timeSinceLastRequest = Date.now() - lastRequestTimestamp;
+			if (timeSinceLastRequest < 10 * 1000 || timeSinceLastRequest > 60 * 60 * 1000) return;
+
+			if (global.gc) global.gc();
+		}, 5000);
+	});
 }
