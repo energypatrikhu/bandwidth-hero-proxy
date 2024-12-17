@@ -3,91 +3,72 @@ import superagent from 'superagent';
 import compress from './compress.js';
 import { convertFileSize, logger } from '@energypatrikhu/node-utils';
 import { beautifyObject } from './beautify-object.js';
-import { omitStartWith } from './omit.js';
+import { omitEquals } from './omit.js';
 
 export default async function proxy(appRequest: Request, appResponse: Response) {
-	const headers = {
-		...omitStartWith(appRequest.headers, ['host']),
-		via: '1.1 bandwidth-hero',
-	};
+	const headers = omitEquals(appRequest.headers, ['host']);
+
+	if (appRequest.app.locals.url === undefined) {
+		logger('error', 'URL is not defined');
+		return;
+	}
+
+	if (appRequest.app.locals.quality === undefined) {
+		logger('error', 'Quality is not defined');
+		return;
+	}
 
 	try {
-		if (appRequest.app.locals.url === undefined) {
-			logger('error', 'URL is not defined');
-			return;
-		}
-		if (appRequest.app.locals.quality === undefined) {
-			logger('error', 'Quality is not defined');
-			return;
-		}
-
 		const netResponse = await superagent
 			.get(appRequest.app.locals.url)
 			.set(headers)
-			.timeout({
-				response: 30000,
-				deadline: 60000,
-			})
+			.timeout(60000)
 			.retry(3)
 			.withCredentials()
 			.responseType('arraybuffer')
 			.buffer(true);
 
-		const mediaSize = netResponse.body.length;
+		appResponse.set(netResponse.headers);
+
 		const compressedImage = await compress(netResponse.body, appRequest.app.locals);
 		const compressedSize = compressedImage.info.size;
+		const mediaSize = netResponse.body.length;
 		const savedSize = mediaSize - compressedSize;
 
 		const compressedSizePercentage = (compressedSize / mediaSize) * 100;
 		const savedSizePercentage = 100 - compressedSizePercentage;
 
-		let responseHeaders = netResponse.headers;
-		let usingOrigin = true;
-
 		if (savedSize > 0) {
-			usingOrigin = false;
-			responseHeaders = {
-				...responseHeaders,
+			appResponse.set({
 				'content-encoding': 'identity',
 				'content-type': `image/${appRequest.app.locals.format}`,
 				'content-length': compressedSize.toString(),
-				'x-original-size': mediaSize,
+				'x-original-size': mediaSize.toString(),
 				'x-bytes-saved': savedSize.toString(),
-			};
+			});
+			appResponse.removeHeader('transfer-encoding');
+			appResponse.send(compressedImage.data);
+		} else {
+			appResponse.send(netResponse.body);
 		}
 
-		appResponse.writeHead(200, responseHeaders);
-		appResponse.write(usingOrigin ? netResponse.body : compressedImage.data);
-
-		appResponse.end(() => {
+		appResponse.on('finish', () => {
 			logger(
 				'info',
 				'\n' +
 					beautifyObject({
 						worker: process.pid,
 						params: appRequest.app.locals,
-						request_headers: headers,
-						response_headers: responseHeaders,
+						req_headers: headers,
+						res_headers: appResponse.getHeaders(),
 						body: {
 							originalSize: convertFileSize(mediaSize, 2),
 							compressedSize: convertFileSize(compressedSize, 2) + ` (${compressedSizePercentage.toFixed(2)}%)`,
-							savedSize: convertFileSize(savedSize, 2) + ` (${savedSizePercentage.toFixed(2)}%)`,
-							usingOrigin,
+							savedSize:
+								(savedSize < 0 ? '-' : '') + convertFileSize(Math.abs(savedSize), 2) + ` (${savedSizePercentage.toFixed(2)}%)`,
 						},
 					}),
 			);
-
-			appResponse.flushHeaders();
-			appResponse.destroy();
-			appRequest.drop(Infinity);
-			appRequest.destroy();
-
-			netResponse.body.set([]);
-			netResponse.body.fill(0);
-			netResponse.body = Buffer.alloc(0);
-			compressedImage.data.set([]);
-			compressedImage.data.fill(0);
-			compressedImage.data = Buffer.alloc(0);
 
 			if (gc) gc();
 			else if (global.gc) global.gc();
@@ -113,20 +94,7 @@ export default async function proxy(appRequest: Request, appResponse: Response) 
 			return;
 		}
 
-		appResponse
-			.writeHead(302, {
-				'Content-Length': '0',
-				'Location': encodeURI(appRequest.app.locals.url),
-			})
-			.end(() => {
-				appResponse.flushHeaders();
-				appResponse.destroy();
-				appRequest.drop(Infinity);
-				appRequest.destroy();
-
-				if (gc) gc();
-				else if (global.gc) global.gc();
-			});
+		appResponse.redirect(appRequest.app.locals.url);
 
 		if (gc) gc();
 		else if (global.gc) global.gc();
