@@ -16,13 +16,13 @@ export function parseRequestParameters(request: Request, response: Response, nex
 		}
 	}
 
-	if (extraQueryParams) {
-		filteredQueryParams.url += extraQueryParams;
-	}
-
 	if (!filteredQueryParams.url) {
 		response.send('bandwidth-hero-proxy');
 		return;
+	}
+
+	if (extraQueryParams) {
+		filteredQueryParams.url += extraQueryParams;
 	}
 
 	const finalUrl = Array.isArray(filteredQueryParams.url) ? filteredQueryParams.url.join('&url=') : filteredQueryParams.url;
