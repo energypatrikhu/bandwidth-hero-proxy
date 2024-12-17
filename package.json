@@ -11,19 +11,19 @@
   },
   "dependencies": {
     "@energypatrikhu/node-utils": "0.2.1",
-    "express": "5.0.0",
+    "express": "5.0.1",
     "lodash": "4.17.21",
     "sharp": "0.33.5",
-    "superagent": "10.1.0",
-    "user-agents": "1.1.325"
+    "superagent": "10.1.1",
+    "user-agents": "1.1.390"
   },
   "devDependencies": {
     "@energypatrikhu/esbuild-wrapper": "0.0.10",
-    "@types/express": "4.17.21",
-    "@types/lodash": "4.17.7",
-    "@types/node": "22.5.5",
+    "@types/express": "5.0.0",
+    "@types/lodash": "4.17.13",
+    "@types/node": "22.10.2",
     "@types/superagent": "8.1.9",
     "@types/user-agents": "1.0.4",
-    "typescript": "5.6.2"
+    "typescript": "5.7.2"
   }
 }
