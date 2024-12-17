@@ -6,7 +6,13 @@ import { beautifyObject } from './beautify-object.js';
 import { omitEquals } from './omit-equals.js';
 
 export async function handleImageProxyRequest(appRequest: Request, appResponse: Response) {
-	const filteredRequestHeaders = omitEquals(appRequest.headers, ['host']);
+	const filteredRequestHeaders = {
+		...omitEquals(appRequest.headers, ['host']),
+		'accept-encoding': '*',
+		'accept': '*/*',
+		'cache-control': 'no-cache',
+		'pragma': 'no-cache',
+	};
 	const { url, format } = appRequest.app.locals;
 
 	try {
