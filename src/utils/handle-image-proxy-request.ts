@@ -46,6 +46,8 @@ export async function handleImageProxyRequest(
 			? await compressImageToBestFormat(externalImageResponse.body, appRequest.app.locals)
 			: await compressImage(externalImageResponse.body, appRequest.app.locals);
 
+		const compressedImageSizes = 'sizes' in compressedImageResult ? (compressedImageResult.sizes as any) : {};
+
 		const compressedImageSize = compressedImageResult.image.info.size;
 		const originalImageSize = externalImageResponse.body.length;
 		const savedImageSize = originalImageSize - compressedImageSize;
@@ -79,6 +81,7 @@ export async function handleImageProxyRequest(
 						worker: process.pid,
 						params: appRequest.app.locals,
 						body: {
+							...compressedImageSizes,
 							originalSize: originalImageSizeStr,
 							compressedSize: compressedImageSizeStr,
 							error: 'Cannot compress!',
@@ -102,6 +105,7 @@ export async function handleImageProxyRequest(
 					req_headers: filteredRequestHeaders,
 					res_headers: appResponse.getHeaders(),
 					body: {
+						...compressedImageSizes,
 						originalSize: originalImageSizeStr,
 						compressedSize: compressedImageSizeStr,
 						savedSize: savedImageSizeStr,
