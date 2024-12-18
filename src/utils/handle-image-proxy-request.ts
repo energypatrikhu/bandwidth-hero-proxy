@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import superagent from 'superagent';
-import { compressImage } from './compress-image.js';
+import { compressImage } from './compress-image';
 import { convertFileSize, logger } from '@energypatrikhu/node-utils';
-import { beautifyObject } from './beautify-object.js';
-import { omitEquals } from './omit-equals.js';
+import { beautifyObject } from './beautify-object';
+import { omitEquals } from './omit-equals';
 
 export async function handleImageProxyRequest(
 	appRequest: Request,

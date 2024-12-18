@@ -3,8 +3,8 @@ import cluster from 'cluster';
 import { availableParallelism } from 'os';
 import process from 'process';
 import { logger } from '@energypatrikhu/node-utils';
-import { parseRequestParameters } from './parse-request-parameters.js';
-import { handleImageProxyRequest } from './handle-image-proxy-request.js';
+import { parseRequestParameters } from './utils/parse-request-parameters';
+import { handleImageProxyRequest } from './utils/handle-image-proxy-request';
 
 const maxClusterSize = process.env.MAX_CLUSTER_SIZE || '4';
 const cpuCount = Math.min(availableParallelism(), parseInt(maxClusterSize, 10));
