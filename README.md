@@ -112,4 +112,4 @@
   - Try alternative format if current format is larger after compression than original (default: false)
 
 - `QUEUE_SIZE_PER_CLUSTER`
-  - Maximum number of requests to queue per cluster (default: 4)
+  - Maximum number of requests to queue per cluster (default: CLUSTER_SIZE)
