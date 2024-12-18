@@ -6,9 +6,13 @@ import { logger } from '@energypatrikhu/node-utils';
 import { parseRequestParameters } from './utils/parse-request-parameters';
 import { handleImageProxyRequest } from './utils/handle-image-proxy-request';
 
+// @ts-ignore
+import queue from 'express-queue';
+
 const maxClusterSize = process.env.MAX_CLUSTER_SIZE || '4';
 const cpuCount = Math.min(availableParallelism(), parseInt(maxClusterSize, 10));
 const clusterSize = parseInt(process.env.CLUSTER_SIZE || '0', 10) || cpuCount;
+const queueSize = parseInt(process.env.QUEUE_SIZE_PER_CLUSTER || '0', 10) || 4;
 
 if (cluster.isPrimary) {
 	logger('info', `Primary process ${process.pid} is running`);
@@ -24,6 +28,8 @@ if (cluster.isPrimary) {
 } else {
 	const app = express();
 	const serverPort = process.env.PORT || 80;
+
+	app.use(queue({ activeLimit: queueSize, queuedLimit: -1 }));
 
 	let lastRequestTimestamp = Date.now();
 

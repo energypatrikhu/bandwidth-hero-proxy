@@ -12,6 +12,7 @@
   "dependencies": {
     "@energypatrikhu/node-utils": "0.2.3",
     "express": "5.0.1",
+    "express-queue": "^0.0.13",
     "sharp": "0.33.5",
     "superagent": "10.1.1"
   },
