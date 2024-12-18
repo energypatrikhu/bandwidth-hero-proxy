@@ -56,11 +56,11 @@ export async function handleImageProxyRequest(
 		const savedSizePercentage = 100 - compressedSizePercentage;
 
 		const originalImageSizeStr = convertFileSize(originalImageSize, 2);
-		const compressedImageSizeStr = `${convertFileSize(compressedImageSize, 2)} (${compressedSizePercentage.toFixed(2)}%)`;
+		const compressedImageSizeStr = `${convertFileSize(compressedImageSize, 2)} ( ${compressedSizePercentage.toFixed(2)} % )`;
 		const savedImageSizeStr = `${savedImageSize < 0 ? '-' : ''}${convertFileSize(
 			Math.abs(savedImageSize),
 			2,
-		)} (${savedSizePercentage.toFixed(2)}%)`;
+		)} ( ${savedSizePercentage.toFixed(2)} % )`;
 
 		appResponse.removeHeader('transfer-encoding');
 
