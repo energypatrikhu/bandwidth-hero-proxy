@@ -42,9 +42,10 @@ export async function handleImageProxyRequest(
 
 		appResponse.set(externalImageResponse.headers);
 
-		const compressedImageResult = process.env.USE_BEST_COMPRESSION_FORMAT
-			? await compressImageToBestFormat(externalImageResponse.body, appRequest.app.locals)
-			: await compressImage(externalImageResponse.body, appRequest.app.locals);
+		const compressedImageResult =
+			process.env.USE_BEST_COMPRESSION_FORMAT === 'true'
+				? await compressImageToBestFormat(externalImageResponse.body, appRequest.app.locals)
+				: await compressImage(externalImageResponse.body, appRequest.app.locals);
 
 		const compressedImageSizes = 'sizes' in compressedImageResult ? { sizes: compressedImageResult.sizes as any } : {};
 
