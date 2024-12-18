@@ -4,6 +4,7 @@ import { compressImage } from './compress-image';
 import { convertFileSize, logger } from '@energypatrikhu/node-utils';
 import { beautifyObject } from './beautify-object';
 import { omitEquals } from './omit-equals';
+import { compressImageToBestFormat } from './compress-image-to-best-format';
 
 export async function handleImageProxyRequest(
 	appRequest: Request,
@@ -27,7 +28,6 @@ export async function handleImageProxyRequest(
 		: appRequest.app.locals.format;
 
 	const url = appRequest.app.locals.url;
-	const format = appRequest.app.locals.format;
 
 	try {
 		const externalImageResponse = await superagent
@@ -42,8 +42,11 @@ export async function handleImageProxyRequest(
 
 		appResponse.set(externalImageResponse.headers);
 
-		const compressedImageResult = await compressImage(externalImageResponse.body, appRequest.app.locals);
-		const compressedImageSize = compressedImageResult.info.size;
+		const compressedImageResult = process.env.USE_BEST_COMPRESSION_FORMAT
+			? await compressImageToBestFormat(externalImageResponse.body, appRequest.app.locals)
+			: await compressImage(externalImageResponse.body, appRequest.app.locals);
+
+		const compressedImageSize = compressedImageResult.image.info.size;
 		const originalImageSize = externalImageResponse.body.length;
 		const savedImageSize = originalImageSize - compressedImageSize;
 
@@ -62,12 +65,12 @@ export async function handleImageProxyRequest(
 		if (savedImageSize > 0) {
 			appResponse.set({
 				'content-encoding': 'identity',
-				'content-type': `image/${format}`,
+				'content-type': `image/${compressedImageResult.format}`,
 				'content-length': compressedImageSize.toString(),
 				'x-original-size': originalImageSize.toString(),
 				'x-bytes-saved': savedImageSize.toString(),
 			});
-			appResponse.send(compressedImageResult.data);
+			appResponse.send(compressedImageResult.image.data);
 		} else {
 			if (!tryAlternativeFormat && process.env.ENABLE_ALTERNATIVE_FORMAT === 'true') {
 				logger(
