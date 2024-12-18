@@ -1,7 +1,7 @@
 import { availableParallelism } from 'os';
 import sharp from 'sharp';
 
-export async function compressImage(imageBuffer: Buffer, compressionOptions: Express.Locals) {
+export function compressImage(imageBuffer: Buffer, compressionOptions: Express.Locals) {
 	try {
 		sharp.cache(false);
 		sharp.simd(true);
@@ -23,7 +23,7 @@ export async function compressImage(imageBuffer: Buffer, compressionOptions: Exp
 			imageProcessor[compressionOptions.format](formatSpecificOptions[compressionOptions.format]);
 		}
 
-		return await imageProcessor.toBuffer({ resolveWithObject: true });
+		return imageProcessor.toBuffer({ resolveWithObject: true });
 	} catch (error) {
 		throw error ?? new Error('Unexpected error occurred during image compression');
 	}
