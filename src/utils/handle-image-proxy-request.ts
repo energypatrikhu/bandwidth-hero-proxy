@@ -77,17 +77,18 @@ export async function handleImageProxyRequest(
 			if (!tryAlternativeFormat && process.env.ENABLE_ALTERNATIVE_FORMAT === 'true') {
 				logger(
 					'info',
-					beautifyObject({
-						worker: process.pid,
-						params: appRequest.app.locals,
-						body: {
-							...compressedImageSizes,
-							originalSize: originalImageSizeStr,
-							compressedSize: compressedImageSizeStr,
-							error: 'Cannot compress!',
-							reason: 'No size reduction, trying alternative format',
-						},
-					}),
+					'\n' +
+						beautifyObject({
+							worker: process.pid,
+							params: appRequest.app.locals,
+							body: {
+								...compressedImageSizes,
+								originalSize: originalImageSizeStr,
+								compressedSize: compressedImageSizeStr,
+								error: 'Cannot compress!',
+								reason: 'No size reduction, trying alternative format',
+							},
+						}),
 				);
 
 				return handleImageProxyRequest(appRequest, appResponse, _next, true);
@@ -99,18 +100,19 @@ export async function handleImageProxyRequest(
 		appResponse.on('finish', () => {
 			logger(
 				'info',
-				beautifyObject({
-					worker: process.pid,
-					params: appRequest.app.locals,
-					req_headers: filteredRequestHeaders,
-					res_headers: appResponse.getHeaders(),
-					body: {
-						...compressedImageSizes,
-						originalSize: originalImageSizeStr,
-						compressedSize: compressedImageSizeStr,
-						savedSize: savedImageSizeStr,
-					},
-				}),
+				'\n' +
+					beautifyObject({
+						worker: process.pid,
+						params: appRequest.app.locals,
+						req_headers: filteredRequestHeaders,
+						res_headers: appResponse.getHeaders(),
+						body: {
+							...compressedImageSizes,
+							originalSize: originalImageSizeStr,
+							compressedSize: compressedImageSizeStr,
+							savedSize: savedImageSizeStr,
+						},
+					}),
 			);
 
 			if (global.gc) global.gc();
@@ -118,15 +120,16 @@ export async function handleImageProxyRequest(
 	} catch (error: any) {
 		logger(
 			'error',
-			beautifyObject({
-				worker: process.pid,
-				params: appRequest.app.locals,
-				headers: filteredRequestHeaders,
-				body: {
-					error: 'Cannot compress!',
-					reason: error.message ?? error,
-				},
-			}),
+			'\n' +
+				beautifyObject({
+					worker: process.pid,
+					params: appRequest.app.locals,
+					headers: filteredRequestHeaders,
+					body: {
+						error: 'Cannot compress!',
+						reason: error.message ?? error,
+					},
+				}),
 		);
 
 		if (!appResponse.headersSent) {
