@@ -7,11 +7,13 @@ export async function compressImageToBestFormat(imageBuffer: Buffer, compression
 		compressImage(imageBuffer, { ...compressionOptions, format: 'jpeg' }),
 	]);
 
+	const result = compressedImageResults.sort((a, b) => a.image.info.size - b.image.info.size)[0];
+
 	return {
-		...compressedImageResults.sort((a, b) => a.image.info.size - b.image.info.size)[0],
+		...result,
 		sizes: {
-			webp: convertFileSize(compressedImageResults[0].image.info.size, 2),
-			jpeg: convertFileSize(compressedImageResults[1].image.info.size, 2),
+			webp: convertFileSize(compressedImageResults[0].image.info.size, 2) + (result.format === 'webp' ? ' (best)' : ''),
+			jpeg: convertFileSize(compressedImageResults[1].image.info.size, 2) + (result.format === 'jpeg' ? ' (best)' : ''),
 		},
 	};
 }
