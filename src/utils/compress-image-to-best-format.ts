@@ -8,12 +8,14 @@ export async function compressImageToBestFormat(imageBuffer: Buffer, compression
 	]);
 
 	const result = compressedImageResults.sort((a, b) => a.image.info.size - b.image.info.size)[0];
+	const webpSize = compressedImageResults.find((result) => result.format === 'webp')?.image.info.size!;
+	const jpegSize = compressedImageResults.find((result) => result.format === 'jpeg')?.image.info.size!;
 
 	return {
 		...result,
 		sizes: {
-			webp: convertFileSize(compressedImageResults[0].image.info.size, 2) + (result.format === 'webp' ? ' (best)' : ''),
-			jpeg: convertFileSize(compressedImageResults[1].image.info.size, 2) + (result.format === 'jpeg' ? ' (best)' : ''),
+			webp: convertFileSize(webpSize, 2) + (result.format === 'webp' ? ' (best)' : ''),
+			jpeg: convertFileSize(jpegSize, 2) + (result.format === 'jpeg' ? ' (best)' : ''),
 		},
 	};
 }
