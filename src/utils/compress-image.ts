@@ -1,11 +1,13 @@
 import { availableParallelism } from 'os';
 import sharp from 'sharp';
 
+const concurrency = process.env.SHARP_CONCURRENCY ? parseInt(process.env.SHARP_CONCURRENCY, 10) : availableParallelism();
+
 export async function compressImage(imageBuffer: Buffer, compressionOptions: Express.Locals) {
 	try {
 		sharp.cache(false);
 		sharp.simd(true);
-		sharp.concurrency(availableParallelism());
+		sharp.concurrency(concurrency);
 
 		const imageProcessor = sharp(imageBuffer, {
 			animated: compressionOptions.format === 'webp',
