@@ -97,20 +97,16 @@
 # Environment Variables
 
 - `MAX_CLUSTER_SIZE`
-
   - Maximum number of workers to spawn (ignored if `CLUSTER_SIZE` is set) (default: 4)
 
 - `CLUSTER_SIZE`
-
   - Number of workers to spawn (default: 0 (number of CPU threads))
 
 - `SHARP_CONCURRENCY`
-
   - Number of threads to use for image processing (default: number of CPU threads)
 
 - `USE_BEST_COMPRESSION_FORMAT`
-
-  - Use best format that achieves the best compression (default: false)
+  - Use format that achieves the best compression (default: false)
 
 - `ENABLE_ALTERNATIVE_FORMAT`
-  - Use alternative format if current format is larger than original (default: false)
+  - Try alternative format if current format is larger after compression than original (default: false)
