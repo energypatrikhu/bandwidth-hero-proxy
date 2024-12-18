@@ -49,7 +49,7 @@ export async function handleImageProxyRequest(appRequest: Request, appResponse: 
 			});
 			appResponse.send(compressedImageResult.data);
 		} else {
-			appResponse.send(externalImageResponse.body);
+			appResponse.redirect(url);
 		}
 
 		appResponse.on('finish', () => {
