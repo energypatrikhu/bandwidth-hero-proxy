@@ -5,7 +5,12 @@ import { convertFileSize, logger } from '@energypatrikhu/node-utils';
 import { beautifyObject } from './beautify-object.js';
 import { omitEquals } from './omit-equals.js';
 
-export async function handleImageProxyRequest(appRequest: Request, appResponse: Response) {
+export async function handleImageProxyRequest(
+	appRequest: Request,
+	appResponse: Response,
+	_next: () => void,
+	tryAlternativeFormat = false,
+) {
 	const filteredRequestHeaders = {
 		...omitEquals(appRequest.headers, ['host']),
 		'accept-encoding': '*',
@@ -14,7 +19,15 @@ export async function handleImageProxyRequest(appRequest: Request, appResponse: 
 		'pragma': 'no-cache',
 		'connection': 'close',
 	};
-	const { url, format } = appRequest.app.locals;
+
+	appRequest.app.locals.format = tryAlternativeFormat
+		? appRequest.app.locals.format === 'webp'
+			? 'jpeg'
+			: 'webp'
+		: appRequest.app.locals.format;
+
+	const url = appRequest.app.locals.url;
+	const format = appRequest.app.locals.format;
 
 	try {
 		const externalImageResponse = await superagent
@@ -37,6 +50,13 @@ export async function handleImageProxyRequest(appRequest: Request, appResponse: 
 		const compressedSizePercentage = (compressedImageSize / originalImageSize) * 100;
 		const savedSizePercentage = 100 - compressedSizePercentage;
 
+		const originalImageSizeStr = convertFileSize(originalImageSize, 2);
+		const compressedImageSizeStr = `${convertFileSize(compressedImageSize, 2)} (${compressedSizePercentage.toFixed(2)}%)`;
+		const savedImageSizeStr = `${savedImageSize < 0 ? '-' : ''}${convertFileSize(
+			Math.abs(savedImageSize),
+			2,
+		)} (${savedSizePercentage.toFixed(2)}%)`;
+
 		appResponse.removeHeader('transfer-encoding');
 
 		if (savedImageSize > 0) {
@@ -49,6 +69,24 @@ export async function handleImageProxyRequest(appRequest: Request, appResponse: 
 			});
 			appResponse.send(compressedImageResult.data);
 		} else {
+			if (!tryAlternativeFormat && process.env.ENABLE_ALTERNATIVE_FORMAT === 'true') {
+				logger(
+					'info',
+					beautifyObject({
+						worker: process.pid,
+						params: appRequest.app.locals,
+						body: {
+							originalSize: originalImageSizeStr,
+							compressedSize: compressedImageSizeStr,
+							error: 'Cannot compress!',
+							reason: 'No size reduction, trying alternative format',
+						},
+					}),
+				);
+
+				return handleImageProxyRequest(appRequest, appResponse, _next, true);
+			}
+
 			appResponse.redirect(url);
 		}
 
@@ -61,12 +99,9 @@ export async function handleImageProxyRequest(appRequest: Request, appResponse: 
 					req_headers: filteredRequestHeaders,
 					res_headers: appResponse.getHeaders(),
 					body: {
-						originalSize: convertFileSize(originalImageSize, 2),
-						compressedSize: `${convertFileSize(compressedImageSize, 2)} (${compressedSizePercentage.toFixed(2)}%)`,
-						savedSize: `${savedImageSize < 0 ? '-' : ''}${convertFileSize(
-							Math.abs(savedImageSize),
-							2,
-						)} (${savedSizePercentage.toFixed(2)}%)`,
+						originalSize: originalImageSizeStr,
+						compressedSize: compressedImageSizeStr,
+						savedSize: savedImageSizeStr,
 					},
 				}),
 			);
