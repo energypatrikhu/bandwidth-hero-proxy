@@ -103,7 +103,13 @@
   - Number of workers to spawn (default: 0 (number of CPU threads))
 
 - `SHARP_CONCURRENCY`
-  - Number of threads to use for image processing (default: number of CPU threads)
+  - Number of threads to use for image processing (default: 0 (auto))
+
+- `SHARP_CACHE`
+  - Enable sharp cache (default: true)
+
+- `SHARP_SIMD`
+  - Enable sharp SIMD (default: true)
 
 - `USE_BEST_COMPRESSION_FORMAT`
   - Use format that achieves the best compression (default: false)
