@@ -1,15 +1,7 @@
 import sharp from 'sharp';
 
-const sharpConcurrency = process.env.SHARP_CONCURRENCY ? parseInt(process.env.SHARP_CONCURRENCY, 10) : 0;
-const sharpCache = process.env.SHARP_CACHE ? process.env.SHARP_CACHE === 'true' : true;
-const sharpSimd = process.env.SHARP_SIMD ? process.env.SHARP_SIMD === 'true' : true;
-
 export async function compressImage(imageBuffer: Buffer, compressionOptions: Express.Locals) {
 	try {
-		sharp.concurrency(sharpConcurrency);
-		sharp.cache(sharpCache);
-		sharp.simd(sharpSimd);
-
 		const imageProcessor = sharp(imageBuffer, {
 			animated: compressionOptions.format === 'webp',
 			limitInputPixels: false,
