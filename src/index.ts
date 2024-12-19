@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { type NextFunction, type Request, type Response } from 'express';
 import cluster from 'cluster';
 import { availableParallelism } from 'os';
 import process from 'process';
@@ -40,15 +40,15 @@ if (cluster.isPrimary) {
 
 	app.use(queue({ activeLimit: queueSize, queuedLimit: -1 }));
 
-	// let lastRequestTimestamp = Date.now();
+	let lastRequestTimestamp = Date.now();
 
-	// const updateLastRequestTimestamp = (_req: Request, _res: Response, next: NextFunction) => {
-	// 	lastRequestTimestamp = Date.now();
-	// 	next();
-	// };
+	const updateLastRequestTimestamp = (_req: Request, _res: Response, next: NextFunction) => {
+		lastRequestTimestamp = Date.now();
+		next();
+	};
 
-	// app.get('/', parseRequestParameters, updateLastRequestTimestamp, handleImageProxyRequest);
-	app.get('/', parseRequestParameters, handleImageProxyRequest);
+	app.get('/', parseRequestParameters, updateLastRequestTimestamp, handleImageProxyRequest);
+	// app.get('/', parseRequestParameters, handleImageProxyRequest);
 	app.get('/favicon.ico', (_req, res) => {
 		res.sendStatus(204);
 	});
@@ -56,11 +56,11 @@ if (cluster.isPrimary) {
 	app.listen(serverPort, () => {
 		logger('info', `Worker process ${process.pid} listening on port ${serverPort}`);
 
-		// setInterval(() => {
-		// 	const timeSinceLastRequest = Date.now() - lastRequestTimestamp;
-		// 	if (timeSinceLastRequest < 10 * 1000 || timeSinceLastRequest > 60 * 60 * 1000) return;
+		setInterval(() => {
+			const timeSinceLastRequest = Date.now() - lastRequestTimestamp;
+			if (timeSinceLastRequest < 10 * 1000 || timeSinceLastRequest > 60 * 1000) return;
 
-		// 	// if (globalThis.gc) globalThis.gc();
-		// }, 5000);
+			if (globalThis.gc) globalThis.gc();
+		}, 5000);
 	});
 }

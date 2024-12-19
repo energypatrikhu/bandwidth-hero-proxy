@@ -9,4 +9,4 @@ RUN npm ci --no-audit
 
 COPY build .
 
-ENTRYPOINT [ "node", "index.js" ]
+ENTRYPOINT [ "node", "--expose-gc", "index.js" ]
