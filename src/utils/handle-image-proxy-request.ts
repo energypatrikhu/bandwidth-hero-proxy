@@ -98,7 +98,7 @@ export async function handleImageProxyRequest(
 			appResponse.redirect(url);
 		}
 
-		appResponse.on('finish', () => {
+		appResponse.on('close', () => {
 			logger(
 				'info',
 				'\n' +
