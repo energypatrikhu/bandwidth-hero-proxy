@@ -59,7 +59,7 @@ if (cluster.isPrimary) {
 			const timeSinceLastRequest = Date.now() - lastRequestTimestamp;
 			if (timeSinceLastRequest < 10 * 1000 || timeSinceLastRequest > 60 * 60 * 1000) return;
 
-			if (global.gc) global.gc();
+			// if (globalThis.gc) globalThis.gc();
 		}, 5000);
 	});
 }

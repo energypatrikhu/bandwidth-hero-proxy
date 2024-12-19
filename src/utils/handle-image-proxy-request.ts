@@ -116,7 +116,7 @@ export async function handleImageProxyRequest(
 					}),
 			);
 
-			if (global.gc) global.gc();
+			// if (globalThis.gc) globalThis.gc();
 		});
 	} catch (error: any) {
 		logger(
@@ -137,6 +137,6 @@ export async function handleImageProxyRequest(
 			appResponse.redirect(url);
 		}
 
-		if (global.gc) global.gc();
+		// if (globalThis.gc) globalThis.gc();
 	}
 }
