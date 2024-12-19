@@ -13,7 +13,7 @@ import queue from 'express-queue';
 const maxClusterSize = process.env.MAX_CLUSTER_SIZE || '4';
 const cpuCount = Math.min(availableParallelism(), parseInt(maxClusterSize, 10));
 const clusterSize = process.env.CLUSTER_SIZE ? parseInt(process.env.CLUSTER_SIZE, 10) : cpuCount;
-const queueSize = process.env.QUEUE_SIZE_PER_CLUSTER ? parseInt(process.env.QUEUE_SIZE_PER_CLUSTER, 10) : clusterSize;
+const queueSize = process.env.QUEUE_SIZE_PER_CLUSTER ? parseInt(process.env.QUEUE_SIZE_PER_CLUSTER, 10) : false;
 
 const sharpConcurrency = process.env.SHARP_CONCURRENCY ? parseInt(process.env.SHARP_CONCURRENCY, 10) : 0;
 const sharpCache = process.env.SHARP_CACHE ? process.env.SHARP_CACHE === 'true' : true;
@@ -38,7 +38,9 @@ if (cluster.isPrimary) {
 	const app = express();
 	const serverPort = process.env.PORT || 80;
 
-	app.use(queue({ activeLimit: queueSize, queuedLimit: -1 }));
+	if (queueSize !== false) {
+		app.use(queue({ activeLimit: queueSize, queuedLimit: -1 }));
+	}
 
 	let lastRequestTimestamp = Date.now();
 
