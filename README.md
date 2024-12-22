@@ -119,3 +119,12 @@
 
 - `QUEUE_SIZE_PER_CLUSTER`
   - Maximum number of requests to queue per cluster (default: false)
+
+- `EXTERNAL_REQUEST_TIMEOUT`
+  - Timeout for external requests (ms) (default: 60000)
+
+- `EXTERNAL_REQUEST_RETRIES`
+  - Number of retries for external requests (default: 5)
+
+- `EXTERNAL_REQUEST_REDIRECTS`
+  - Number of redirects to follow for external requests (default: 10)

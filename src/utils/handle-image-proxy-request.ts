@@ -6,6 +6,16 @@ import { beautifyObject } from './beautify-object';
 import { omitEquals } from './omit-equals';
 import { compressImageToBestFormat } from './compress-image-to-best-format';
 
+const EXTERNAL_REQUEST_TIMEOUT = process.env.EXTERNAL_REQUEST_TIMEOUT
+	? parseInt(process.env.EXTERNAL_REQUEST_TIMEOUT, 10)
+	: 60000;
+
+const EXTERNAL_REQUEST_RETRIES = process.env.EXTERNAL_REQUEST_RETRIES ? parseInt(process.env.EXTERNAL_REQUEST_RETRIES, 10) : 5;
+
+const EXTERNAL_REQUEST_REDIRECTS = process.env.EXTERNAL_REQUEST_REDIRECTS
+	? parseInt(process.env.EXTERNAL_REQUEST_REDIRECTS, 10)
+	: 10;
+
 export async function handleImageProxyRequest(
 	appRequest: Request,
 	appResponse: Response,
@@ -33,9 +43,9 @@ export async function handleImageProxyRequest(
 		const externalImageResponse = await superagent
 			.get(url)
 			.set(filteredRequestHeaders)
-			.timeout(60000)
-			.retry(5)
-			.redirects(10)
+			.timeout(EXTERNAL_REQUEST_TIMEOUT)
+			.retry(EXTERNAL_REQUEST_RETRIES)
+			.redirects(EXTERNAL_REQUEST_REDIRECTS)
 			.withCredentials()
 			.responseType('arraybuffer')
 			.buffer(true);
