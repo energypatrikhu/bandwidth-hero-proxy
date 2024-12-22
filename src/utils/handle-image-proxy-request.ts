@@ -119,6 +119,10 @@ export async function handleImageProxyRequest(
 			if (globalThis.gc) globalThis.gc();
 		});
 	} catch (error: any) {
+		if (!appResponse.headersSent) {
+			appResponse.redirect(url);
+		}
+
 		logger(
 			'error',
 			'\n' +
@@ -132,10 +136,6 @@ export async function handleImageProxyRequest(
 					},
 				}),
 		);
-
-		if (!appResponse.headersSent) {
-			appResponse.redirect(url);
-		}
 
 		if (globalThis.gc) globalThis.gc();
 	}
