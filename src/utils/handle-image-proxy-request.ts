@@ -3,7 +3,7 @@ import superagent from 'superagent';
 import { compressImage } from './compress-image';
 import { convertFileSize, logger } from '@energypatrikhu/node-utils';
 import { beautifyObject } from './beautify-object';
-import { omitEquals } from './omit-equals';
+import { omitEquals, omitPartial } from './omit-equals';
 import { compressImageToBestFormat } from './compress-image-to-best-format';
 
 const EXTERNAL_REQUEST_TIMEOUT = process.env.EXTERNAL_REQUEST_TIMEOUT
@@ -23,7 +23,7 @@ export async function handleImageProxyRequest(
 	tryAlternativeFormat = false,
 ) {
 	const filteredRequestHeaders = {
-		...omitEquals(appRequest.headers, ['host']),
+		...omitPartial(omitEquals(appRequest.headers, ['host']), ['x-forwarded-']),
 		'accept-encoding': '*',
 		'accept': '*/*',
 		'cache-control': 'no-cache',
