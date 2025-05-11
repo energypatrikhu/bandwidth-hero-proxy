@@ -46,6 +46,8 @@ if (confirm.value === "Yes") {
     "build",
     "-t",
     `energyhun24/bandwidth-hero-proxy:${versionUpdateValue}`,
+    "-t",
+    "energyhun24/bandwidth-hero-proxy:latest",
     ".",
   ]);
 
@@ -54,14 +56,20 @@ if (confirm.value === "Yes") {
     "push",
     `energyhun24/bandwidth-hero-proxy:${versionUpdateValue}`,
   ]);
+  await spawnProcess("docker", [
+    "push",
+    "energyhun24/bandwidth-hero-proxy:latest",
+  ]);
 
   // Push changes to GIT
   await spawnProcess("git", ["add", "package.json"]);
   await spawnProcess("git", [
     "commit",
     "-m",
-    `chore: update version to ${versionUpdateValue}`,
+    `"chore: update version to ${versionUpdateValue}"`,
   ]);
+  await spawnProcess("git", ["push"]);
+  await spawnProcess("git", ["checkout", "main"]);
 } else {
   console.log("Aborted.");
 }
