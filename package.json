@@ -12,17 +12,17 @@
   },
   "dependencies": {
     "@energypatrikhu/node-utils": "0.2.3",
-    "express": "5.0.1",
+    "express": "5.1.0",
     "express-queue": "0.0.13",
-    "sharp": "0.33.5",
-    "superagent": "10.2.0"
+    "sharp": "0.34.1",
+    "superagent": "10.2.1"
   },
   "devDependencies": {
     "@energypatrikhu/esbuild-wrapper": "1.0.0",
     "@types/express": "5.0.1",
-    "@types/node": "22.13.13",
+    "@types/node": "22.15.17",
     "@types/superagent": "8.1.9",
-    "cli-select": "^1.1.2",
-    "typescript": "5.8.2"
+    "cli-select": "1.1.2",
+    "typescript": "5.8.3"
   }
 }
