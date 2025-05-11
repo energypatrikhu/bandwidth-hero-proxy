@@ -12,10 +12,12 @@ const versionUpdateValues = {
   Major: updateVersion(version, "Major"),
 };
 
+console.log("Select the version update type:");
+
 const versionUpdate = await cliSelect({
   values: Object.keys(versionUpdateValues),
   valueRenderer: (value) => {
-    return versionUpdateValues[value];
+    return `${value} (${versionUpdateValues[value]})`;
   },
   cleanup: true,
 });
@@ -26,6 +28,8 @@ console.log(`You selected: ${versionUpdateValue}, current version: ${version}`);
 console.log(
   "Do you want to build, publish the image and update the version in package.json?",
 );
+
+process.exit(0);
 
 const confirm = await cliSelect({
   values: ["Yes", "No"],
