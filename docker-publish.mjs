@@ -29,8 +29,6 @@ console.log(
   "Do you want to build, publish the image and update the version in package.json?",
 );
 
-process.exit(0);
-
 const confirm = await cliSelect({
   values: ["Yes", "No"],
   valueRenderer: (value) => {
