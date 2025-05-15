@@ -128,3 +128,8 @@
 
 - `EXTERNAL_REQUEST_REDIRECTS`
   - Number of redirects to follow for external requests (default: 10)
+
+- `EXTERNAL_REQUEST_OMIT_HEADERS`
+  > Info: `Host` header is always omitted
+  - Headers to omit from external requests using regex, separated by spaces or newlines
+    - Example: `^x-.*` will omit all headers starting with `x-`
