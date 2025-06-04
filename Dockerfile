@@ -1,12 +1,11 @@
-FROM node:lts-alpine
+FROM oven/bun:alpine
 
 ENV PORT=80
 
-WORKDIR /opt/app
+WORKDIR /srv
 
-COPY package*.json .
-RUN npm ci --no-audit
+COPY . .
 
-COPY build .
+RUN bun install
 
-ENTRYPOINT [ "node", "--expose-gc", "index.js" ]
+ENTRYPOINT [ "bun", "src/cluster.ts" ]

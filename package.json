@@ -1,28 +1,26 @@
 {
-	"name": "bandwidth-hero-proxy",
-	"main": "build/index.js",
-	"version": "1.0.2",
-	"private": true,
-	"license": "MIT",
-	"scripts": {
-		"build": "esbuild-wrapper",
-		"docker": "npm run build && node ./docker-publish.mjs",
-		"docker:build": "docker build -t energyhun24/bandwidth-hero-proxy .",
-		"docker:push": "docker push energyhun24/bandwidth-hero-proxy:latest"
-	},
-	"dependencies": {
-		"@energypatrikhu/node-utils": "0.2.3",
-		"express": "5.1.0",
-		"express-queue": "0.0.13",
-		"sharp": "0.34.1",
-		"superagent": "10.2.1"
-	},
-	"devDependencies": {
-		"@energypatrikhu/esbuild-wrapper": "1.0.0",
-		"@types/express": "5.0.1",
-		"@types/node": "22.15.17",
-		"@types/superagent": "8.1.9",
-		"cli-select": "1.1.2",
-		"typescript": "5.8.3"
-	}
+  "name": "bandwidth-hero-proxy-bun",
+  "module": "src/index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "bun build src/index.ts --outdir build --minify --target bun",
+    "docker": "bun run build && docker build -t ene/bhp-bun ."
+  },
+  "imports": {
+    "#/*": "./src/*"
+  },
+  "devDependencies": {
+    "@types/bun": "1.2.15",
+    "@types/superagent": "8.1.9",
+    "cli-select": "^1.1.2"
+  },
+  "peerDependencies": {
+    "typescript": "5.8.3"
+  },
+  "dependencies": {
+    "@energypatrikhu/node-utils": "0.2.3",
+    "sharp": "0.34.2",
+    "superagent": "10.2.1"
+  }
 }

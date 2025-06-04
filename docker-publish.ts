@@ -3,7 +3,7 @@ import cliSelect from "cli-select";
 import fs from "fs";
 
 const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
-const version = packageJson.version;
+const version = packageJson.version as string;
 
 const versionUpdateValues = {
   Current: version,
@@ -11,12 +11,15 @@ const versionUpdateValues = {
   Minor: updateVersion(version, "Minor"),
   Major: updateVersion(version, "Major"),
 };
+const versionUpdateValueKeys = Object.keys(
+  versionUpdateValues,
+) as (keyof typeof versionUpdateValues)[];
 
 console.log("Select the version update type:");
 
 const versionUpdate = await cliSelect({
-  values: Object.keys(versionUpdateValues),
-  valueRenderer: (value) => {
+  values: versionUpdateValueKeys,
+  valueRenderer: (value: keyof typeof versionUpdateValues) => {
     return `${value} (${versionUpdateValues[value]})`;
   },
   cleanup: true,
@@ -80,7 +83,7 @@ if (confirm.value === "Yes") {
 
 /* Utility functions */
 
-function updateVersion(version, type) {
+function updateVersion(version: string, type: string) {
   const versionParts = version.split(".").map(Number);
 
   switch (type) {
@@ -103,21 +106,19 @@ function updateVersion(version, type) {
   return versionParts.join(".");
 }
 
-async function spawnProcess(command, args) {
-  return /** @type {Promise<void>} */ (
-    new Promise((resolve, reject) => {
-      const cps = child_process.spawn(command, args, {
-        stdio: "inherit",
-        shell: true,
-      });
+async function spawnProcess(command: string, args: string[]) {
+  return new Promise<void>((resolve, reject) => {
+    const cps = child_process.spawn(command, args, {
+      stdio: "inherit",
+      shell: true,
+    });
 
-      cps.on("exit", (code) => {
-        if (code !== 0) {
-          reject(new Error(`Child process exited with code ${code}`));
-        } else {
-          resolve();
-        }
-      });
-    })
-  );
+    cps.on("exit", (code) => {
+      if (code !== 0) {
+        reject(new Error(`Child process exited with code ${code}`));
+      } else {
+        resolve();
+      }
+    });
+  });
 }
