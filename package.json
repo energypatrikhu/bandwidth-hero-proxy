@@ -3,10 +3,6 @@
   "module": "src/index.ts",
   "type": "module",
   "private": true,
-  "scripts": {
-    "build": "bun build src/index.ts --outdir build --minify --target bun",
-    "docker": "bun run build && docker build -t ene/bhp-bun ."
-  },
   "imports": {
     "#/*": "./src/*"
   },
