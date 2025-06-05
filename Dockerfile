@@ -4,7 +4,8 @@ ENV PORT=80
 
 WORKDIR /srv
 
-COPY . .
+COPY package.json bun.lock tsconfig.json ./
+COPY src src
 
 RUN bun install
 
