@@ -4,6 +4,7 @@
 - [Environment Variables](#environment-variables)
 
 # Usage
+> Note: The app may consume a lot of memory based on usage, for this it is built using `Bun` and using the `--smol` argument.
 
 - Docker (Recommended)
 
