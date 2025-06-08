@@ -1,5 +1,3 @@
-Bun.unsafe.gcAggressionLevel(2);
-
 import { Env } from "#/libs/env";
 import { handleImageProxyRequest } from "#/libs/handle-image-proxy-request";
 import { parseRequestParameters } from "#/libs/parse-request-parameters";

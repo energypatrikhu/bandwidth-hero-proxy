@@ -1,5 +1,3 @@
-Bun.unsafe.gcAggressionLevel(2);
-
 import { Env } from "#/libs/env";
 import { spawn } from "bun";
 
