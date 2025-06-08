@@ -9,4 +9,4 @@ COPY src src
 
 RUN bun install
 
-ENTRYPOINT [ "bun", "--smol", "--title=Bandwidth Hero Proxy", "src/cluster.ts" ]
+ENTRYPOINT [ "bun", "--smol", "src/cluster.ts" ]
