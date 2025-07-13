@@ -4,9 +4,9 @@ ENV PORT=80
 
 WORKDIR /srv
 
-COPY package.json bun.lock tsconfig.json ./
+COPY package.json bun.lock bunfig.toml tsconfig.json ./
 COPY src src
 
 RUN bun install
 
-ENTRYPOINT [ "bun", "--smol", "src/cluster.ts" ]
+ENTRYPOINT [ "bun", "src/cluster.ts" ]
