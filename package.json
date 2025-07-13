@@ -1,24 +1,24 @@
 {
-  "name": "bandwidth-hero-proxy",
-  "module": "src/cluster.ts",
-  "version": "1.1.4",
-  "type": "module",
-  "private": true,
-  "license": "MIT",
-  "imports": {
-    "#/*": "./src/*"
-  },
-  "devDependencies": {
-    "@types/bun": "1.2.18",
-    "@types/superagent": "8.1.9",
-    "cli-select": "1.1.2"
-  },
-  "peerDependencies": {
-    "typescript": "5.8.3"
-  },
-  "dependencies": {
-    "@energypatrikhu/node-utils": "0.2.3",
-    "sharp": "0.34.3",
-    "superagent": "10.2.2"
-  }
+	"name": "bandwidth-hero-proxy",
+	"module": "src/cluster.ts",
+	"version": "1.1.5",
+	"type": "module",
+	"private": true,
+	"license": "MIT",
+	"imports": {
+		"#/*": "./src/*"
+	},
+	"devDependencies": {
+		"@types/bun": "1.2.18",
+		"@types/superagent": "8.1.9",
+		"cli-select": "1.1.2"
+	},
+	"peerDependencies": {
+		"typescript": "5.8.3"
+	},
+	"dependencies": {
+		"@energypatrikhu/node-utils": "0.2.3",
+		"sharp": "0.34.3",
+		"superagent": "10.2.2"
+	}
 }
