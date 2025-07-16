@@ -8,21 +8,12 @@ import { omitRegex } from "#/libs/omit";
 import { convertFileSize, logger } from "@energypatrikhu/node-utils";
 import superagent from "superagent";
 
-export async function handleImageProxyRequest(
-  request: Request,
-  params: RequestParameters,
-  tryAlternativeFormat = false,
-) {
+export async function handleImageProxyRequest(request: Request, params: RequestParameters, tryAlternativeFormat = false) {
   const headers = request.headers.toJSON();
-  const requestHeaders = Object.fromEntries(
-    Object.entries(headers).map(([key, value]) => [key.toLowerCase(), value]),
-  );
+  const requestHeaders = Object.fromEntries(Object.entries(headers).map(([key, value]) => [key.toLowerCase(), value]));
 
   const filteredRequestHeaders = {
-    ...omitRegex(requestHeaders, [
-      /host/i,
-      ...Env.EXTERNAL_REQUEST_OMIT_HEADERS,
-    ]),
+    ...omitRegex(requestHeaders, [/host/i, ...Env.EXTERNAL_REQUEST_OMIT_HEADERS]),
     "accept-encoding": "*",
     "accept": "*/*",
     "cache-control": "no-cache",
@@ -30,11 +21,7 @@ export async function handleImageProxyRequest(
     "connection": "close",
   };
 
-  params.format = tryAlternativeFormat
-    ? params.format === "webp"
-      ? "jpeg"
-      : "webp"
-    : params.format;
+  params.format = tryAlternativeFormat ? (params.format === "webp" ? "jpeg" : "webp") : params.format;
   const url = params.url;
 
   try {
@@ -52,27 +39,18 @@ export async function handleImageProxyRequest(
       ? await compressImageToBestFormat(externalImageResponse.body, params)
       : await compressImage(externalImageResponse.body, params);
 
-    const compressedImageSizes =
-      "sizes" in compressedImageResult
-        ? { sizes: compressedImageResult.sizes as any }
-        : {};
+    const compressedImageSizes = "sizes" in compressedImageResult ? { sizes: compressedImageResult.sizes as any } : {};
 
     const compressedImageSize = compressedImageResult.image.info.size;
     const originalImageSize = externalImageResponse.body.length;
     const savedImageSize = originalImageSize - compressedImageSize;
 
-    const compressedSizePercentage =
-      (compressedImageSize / originalImageSize) * 100;
+    const compressedSizePercentage = (compressedImageSize / originalImageSize) * 100;
     const savedSizePercentage = 100 - compressedSizePercentage;
 
     const originalImageSizeStr = convertFileSize(originalImageSize, 2);
-    const compressedImageSizeStr = `${convertFileSize(
-      compressedImageSize,
-      2,
-    )} ( ${compressedSizePercentage.toFixed(2)} % )`;
-    const savedImageSizeStr = `${
-      savedImageSize < 0 ? "-" : ""
-    }${convertFileSize(
+    const compressedImageSizeStr = `${convertFileSize(compressedImageSize, 2)} ( ${compressedSizePercentage.toFixed(2)} % )`;
+    const savedImageSizeStr = `${savedImageSize < 0 ? "-" : ""}${convertFileSize(
       Math.abs(savedImageSize),
       2,
     )} ( ${savedSizePercentage.toFixed(2)} % )`;
@@ -129,7 +107,9 @@ export async function handleImageProxyRequest(
         return handleImageProxyRequest(request, params, true);
       }
 
-      throw new Error("No size reduction, redirecting to original image");
+      throw new Error(
+        "No size reduction (" + compressedImageSizeStr + " > " + originalImageSizeStr + "), redirecting to original image",
+      );
     }
   } catch (error: any) {
     logger(
