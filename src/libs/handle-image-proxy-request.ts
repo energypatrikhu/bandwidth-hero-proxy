@@ -49,11 +49,10 @@ export async function handleImageProxyRequest(request: Request, params: RequestP
     const savedSizePercentage = 100 - compressedSizePercentage;
 
     const originalImageSizeStr = convertFileSize(originalImageSize, 2);
-    const compressedImageSizeStr = `${convertFileSize(compressedImageSize, 2)} ( ${compressedSizePercentage.toFixed(2)} % )`;
-    const savedImageSizeStr = `${savedImageSize < 0 ? "-" : ""}${convertFileSize(
-      Math.abs(savedImageSize),
-      2,
-    )} ( ${savedSizePercentage.toFixed(2)} % )`;
+    const compressedImageSizeStr = convertFileSize(compressedImageSize, 2);
+    const compressedImageSizePercentageStr = `${compressedImageSizeStr} ( ${compressedSizePercentage.toFixed(2)} % )`;
+    const savedImageSizeStr = (savedImageSize < 0 ? "-" : "") + convertFileSize(Math.abs(savedImageSize), 2);
+    const savedImageSizePercentageStr = `${savedImageSizeStr} ( ${savedSizePercentage.toFixed(2)} % )`;
 
     if (Env.FORCE_SELECTED_FORMAT || savedImageSize > 0) {
       delete externalImageResponse.headers["transfer-encoding"];
@@ -77,8 +76,8 @@ export async function handleImageProxyRequest(request: Request, params: RequestP
             body: {
               ...compressedImageSizes,
               originalSize: originalImageSizeStr,
-              compressedSize: compressedImageSizeStr,
-              savedSize: savedImageSizeStr,
+              compressedSize: compressedImageSizePercentageStr,
+              savedSize: savedImageSizePercentageStr,
             },
           }),
       );
@@ -97,7 +96,7 @@ export async function handleImageProxyRequest(request: Request, params: RequestP
               body: {
                 ...compressedImageSizes,
                 originalSize: originalImageSizeStr,
-                compressedSize: compressedImageSizeStr,
+                compressedSize: compressedImageSizePercentageStr,
                 error: "Cannot compress!",
                 reason: "No size reduction, trying alternative format",
               },
