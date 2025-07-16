@@ -24,6 +24,10 @@ export async function handleImageProxyRequest(request: Request, params: RequestP
   params.format = tryAlternativeFormat ? (params.format === "webp" ? "jpeg" : "webp") : params.format;
   const url = params.url;
 
+  let compressedImageSizes: Record<string, any> = {};
+  let compressedImageSizePercentageStr: string = "unknown";
+  let originalImageSizeStr: string = "unknown";
+
   try {
     const externalImageResponse = await superagent
       .get(url)
@@ -39,7 +43,7 @@ export async function handleImageProxyRequest(request: Request, params: RequestP
       ? await compressImageToBestFormat(externalImageResponse.body, params)
       : await compressImage(externalImageResponse.body, params);
 
-    const compressedImageSizes = "sizes" in compressedImageResult ? { sizes: compressedImageResult.sizes as any } : {};
+    compressedImageSizes = "sizes" in compressedImageResult ? { sizes: compressedImageResult.sizes as any } : {};
 
     const compressedImageSize = compressedImageResult.image.info.size;
     const originalImageSize = externalImageResponse.body.length;
@@ -48,9 +52,9 @@ export async function handleImageProxyRequest(request: Request, params: RequestP
     const compressedSizePercentage = (compressedImageSize / originalImageSize) * 100;
     const savedSizePercentage = 100 - compressedSizePercentage;
 
-    const originalImageSizeStr = convertFileSize(originalImageSize, 2);
+    originalImageSizeStr = convertFileSize(originalImageSize, 2);
     const compressedImageSizeStr = convertFileSize(compressedImageSize, 2);
-    const compressedImageSizePercentageStr = `${compressedImageSizeStr} ( ${compressedSizePercentage.toFixed(2)} % )`;
+    compressedImageSizePercentageStr = `${compressedImageSizeStr} ( ${compressedSizePercentage.toFixed(2)} % )`;
     const savedImageSizeStr = (savedImageSize < 0 ? "-" : "") + convertFileSize(Math.abs(savedImageSize), 2);
     const savedImageSizePercentageStr = `${savedImageSizeStr} ( ${savedSizePercentage.toFixed(2)} % )`;
 
@@ -106,9 +110,7 @@ export async function handleImageProxyRequest(request: Request, params: RequestP
         return handleImageProxyRequest(request, params, true);
       }
 
-      throw new Error(
-        "No size reduction (" + compressedImageSizeStr + " > " + originalImageSizeStr + "), redirecting to original image",
-      );
+      throw new Error("No size reduction, redirecting to original image");
     }
   } catch (error: any) {
     logger(
@@ -119,6 +121,9 @@ export async function handleImageProxyRequest(request: Request, params: RequestP
           params,
           headers: filteredRequestHeaders,
           body: {
+            ...compressedImageSizes,
+            originalSize: originalImageSizeStr,
+            compressedSize: compressedImageSizePercentageStr,
             error: "Cannot compress!",
             reason: error.response
               ? {
