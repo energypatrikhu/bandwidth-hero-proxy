@@ -1,3 +1,8 @@
+# Warning
+**This repository is no longer maintained.** For future updates and improvements, please visit [bandwidth-hero-proxy-go](https://github.com/energypatrikhu/bandwidth-hero-proxy-go), which has been rewritten in Go for better performance and memory usage.
+
+---
+
 # Welcome
 
 - [Usage](#usage)
