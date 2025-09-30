@@ -12,14 +12,14 @@
   2. Spin up the image
      - With docker run
        ```
-       docker run --publish 80:80 energyhun24/bandwidth-hero-proxy:latest
+       docker run --publish 80:80 ghcr.io/energypatrikhu/bandwidth-hero-proxy:latest
        ```
      - Or with docker compose
        ```yml
        services:
          bandwidth-hero-proxy:
            container_name: bandwidth-hero-proxy
-           image: docker.io/energyhun24/bandwidth-hero-proxy:latest
+           image: ghcr.io/energypatrikhu/bandwidth-hero-proxy:latest
            network_mode: bridge
            restart: unless-stopped
            environment:
